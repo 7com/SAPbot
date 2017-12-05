@@ -11,8 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -23,28 +22,44 @@ public class Terminal extends javax.swing.JFrame {
     public SerialPort scorbot;
     private char ser;
     private String pre="";
+    private String[] enco;
     Thread lectura = new Thread() {
         InputStream in;
         public void run() {
            scorbot.openPort();
            in = scorbot.getInputStream();
            while (true){
-               pre="";
+               
                try {
                    ser = (char)in.read();
                    
                    if (ser != '\r')
                    {
+                        if (ser != '>')
                         pre = pre+ser;
-                        //jTextArea1.setText(jTextArea1.getText()+ ser);
+                        //jTextArea1.setText(jTextArea1.getText()+ pre);
                    }
                    else
                    {
                        jTextArea1.setText(jTextArea1.getText()+ "\n" + pre);
+                       enco=capturarEnco(pre);
+                       if (esEnco())
+                       {
+                            for (int i=0; i<6; i++)
+                            {        
+                                System.out.print(enco[i]+" ");
+                            }
+                            System.out.println("salto");
+                       }
+                       pre="";
+                       
                    }
                    jTextArea1.setCaretPosition(jTextArea1.getText().length());
+                   
+                   
                } catch (IOException ex) {
-                   Logger.getLogger(Terminal.class.getName()).log(Level.SEVERE, null, ex);
+                   JOptionPane.showMessageDialog(null,"Se desconectó puerto serial.","Error",JOptionPane.ERROR_MESSAGE);
+                   System.exit(1);
                }
            }
         }  
@@ -53,6 +68,39 @@ public class Terminal extends javax.swing.JFrame {
     /**
      * Creates new form Terminal
      */
+    
+    private boolean esEnco()
+    {
+        if (enco.length != 6)
+        {
+            return false;
+        }
+        else
+        {
+            for (int i=0; i<6;i++){
+                if (!isNumeric(enco[i]))
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    private boolean isNumeric(String str)
+    {
+        if (str.length() != 6){
+            return false;
+        }
+        return str.matches("-?\\d+(\\.\\d+)?");  //match a number with optional '-' and decimal.
+    }
+    
+    private String[] capturarEnco(String str)
+    {
+        String[] lista = str.split("\\s+");
+        return lista;
+    }
+    
     public Terminal() {
         initComponents();
     }
@@ -126,7 +174,7 @@ public class Terminal extends javax.swing.JFrame {
         if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
             OutputStream out = scorbot.getOutputStream();
             PrintStream printStream = new PrintStream(out);
-            String enviar = jTextField1.getText()+"\r";
+            String enviar = jTextField1.getText()+" \r";
             printStream.print(enviar);
             printStream.close();
             jTextField1.setText("");
