@@ -24,6 +24,7 @@ public class Terminal extends javax.swing.JFrame {
     private String pre="";
     private String[] enco;
     private boolean flag=false;
+    private boolean env=false;
     Thread lectura = new Thread() {
         InputStream in;
         public void run() {
@@ -64,6 +65,12 @@ public class Terminal extends javax.swing.JFrame {
                        enco=capturarEnco(pre);
                        if (esEnco())
                        {
+                            if(env==true)
+                            {
+                                jTextArea1.setText(jTextArea1.getText()+"\n");
+                                env=false;
+                            }
+                                
                             for (int i=0; i<6; i++)
                             {        
                                 System.out.print(enco[i]+" ");
@@ -120,8 +127,20 @@ public class Terminal extends javax.swing.JFrame {
     
     private String[] capturarEnco(String str)
     {
-        String[] lista = str.split("\\s+");
-        return lista;
+        String[] lista;
+        try{
+            if (!Character.isWhitespace(str.charAt(0)))
+            {
+                lista = str.split("\\s+");
+            }
+            else
+            {
+                lista = str.substring(1).split("\\s+");
+            }
+            return lista;
+        }catch(StringIndexOutOfBoundsException siobe){
+            return lista = str.split("\\s+");
+        }
     }
     
     public Terminal() {
@@ -201,6 +220,7 @@ public class Terminal extends javax.swing.JFrame {
             printStream.print(enviar);
             printStream.close();
             jTextField1.setText("");
+            env = true;
         }
     }//GEN-LAST:event_jTextField1KeyReleased
 
