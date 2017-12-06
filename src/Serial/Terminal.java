@@ -23,6 +23,7 @@ public class Terminal extends javax.swing.JFrame {
     private char ser;
     private String pre="";
     private String[] enco;
+    private boolean flag=false;
     Thread lectura = new Thread() {
         InputStream in;
         public void run() {
@@ -35,13 +36,31 @@ public class Terminal extends javax.swing.JFrame {
                    
                    if (ser != '\r')
                    {
-                        if (ser != '>')
-                        pre = pre+ser;
-                        //jTextArea1.setText(jTextArea1.getText()+ pre);
+                       if ((ser >= '0' && ser <= '9') || ser == '-' || ser == ' ')
+                       {
+                           if (!flag)
+                           {
+                                jTextArea1.setText(jTextArea1.getText()+pre);
+                                pre = "";
+                                pre=pre+ser;
+                                flag=!flag;
+                           }
+                           else
+                           {
+                               pre=pre+ser;
+                           }
+                       }
+                       else
+                       {
+                            pre = pre+ser;
+                            if (flag)
+                            {
+                                flag=!flag;
+                            }
+                       }
                    }
                    else
                    {
-                       jTextArea1.setText(jTextArea1.getText()+ "\n" + pre);
                        enco=capturarEnco(pre);
                        if (esEnco())
                        {
@@ -50,6 +69,10 @@ public class Terminal extends javax.swing.JFrame {
                                 System.out.print(enco[i]+" ");
                             }
                             System.out.println("salto");
+                       }
+                       else
+                       {
+                           jTextArea1.setText(jTextArea1.getText()+ pre + "\n");
                        }
                        pre="";
                        
