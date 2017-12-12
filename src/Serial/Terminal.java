@@ -20,11 +20,12 @@ import javax.swing.JOptionPane;
 public class Terminal extends javax.swing.JFrame {
 
     public SerialPort scorbot;
+    private String captura="";
     private char ser;
-    private String pre="";
-    private String enviado="";
     private String[] enco;
-    private boolean env=false;
+    private String temp="";
+    private boolean nenco = false;
+    
     Thread lectura = new Thread() {
         InputStream in;
         public void run() {
@@ -32,52 +33,63 @@ public class Terminal extends javax.swing.JFrame {
            in = scorbot.getInputStream();
            while (true){
                
-               try {
-                   
-                   ser = (char)in.read();
-                   
-                   if (!enviado.isEmpty())
-                   {
-                        while(!enviado.isEmpty() && enviado.charAt(0) == ser)
+               try 
+               {
+                    ser = (char)in.read();
+                    while (ser != '\r')
+                    {
+                        captura=captura+ser;
+                        ser = (char)in.read();
+                    }
+                    
+                    enco=capturarEnco(captura);
+                    if (esEnco(enco))
+                    {
+                        for(int i=0; i<6; i++)
                         {
-                            enviado=enviado.substring(1);
-                            ser = (char)in.read();
+                            System.out.print(enco[i]+" ");
                         }
-                   }
-                   
-                   if (ser != '\r')
-                   {
-                        if (ser != '>')
-                            pre=pre+ser;
-                   }
-                   else
-                   {
-                       enco=capturarEnco(pre);
-                       if (esEnco())
-                       {
-                            if(env==true)
+                        System.out.println();
+                    }
+                    
+                    else
+                    {
+                        if(!captura.isEmpty())
+                        {
+                            for (int i=0; i<captura.length(); i++)
                             {
-                                jTextArea1.setText(jTextArea1.getText()+"\n");
-                                env=false;
+                                if (captura.charAt(i) == '-' || captura.charAt(i) == '0')
+                                {
+                                    temp=temp+captura.charAt(i);
+                                    i++;
+                                    while(i<captura.length() && captura.charAt(i) == ' ')
+                                    {
+                                        if (ser >= '0' && ser <= '9')
+                                        {
+                                            temp=temp+captura.charAt(i);
+                                            i++;
+                                        }
+                                        else
+                                        {
+                                            jTextArea1.setText(jTextArea1.getText()+captura.charAt(i));
+                                            i++;
+                                        }
+                                    }
+                                    temp=temp+" ";
+                                }
+                                else
+                                {
+                                    jTextArea1.setText(jTextArea1.getText()+captura.charAt(i));
+                                }
                             }
-                                
-                            for (int i=0; i<6; i++)
-                            {        
-                                System.out.print(enco[i]+" ");
-                            }
-                            System.out.println("salto");
-                       }
-                       else
-                       {
-                           if (!pre.isEmpty())
-                                  jTextArea1.setText(jTextArea1.getText()+ pre + "\n");
-                       }
-                       pre="";
-                       
-                   }
-                   jTextArea1.setCaretPosition(jTextArea1.getText().length());
-                   
-                   
+                            temp="";
+                            jTextArea1.setText(jTextArea1.getText()+"\n");
+                            jTextArea1.setCaretPosition(jTextArea1.getText().length());
+                        }
+                    }
+                    captura="";
+                    
+                    
                } catch (IOException ex) {
                    JOptionPane.showMessageDialog(null,"Se desconectó puerto serial.","Error",JOptionPane.ERROR_MESSAGE);
                    System.exit(1);
@@ -90,7 +102,7 @@ public class Terminal extends javax.swing.JFrame {
      * Creates new form Terminal
      */
     
-    private boolean esEnco()
+    private boolean esEnco(String[] enco)
     {
         if (enco.length != 6)
         {
@@ -99,7 +111,7 @@ public class Terminal extends javax.swing.JFrame {
         else
         {
             for (int i=0; i<6;i++){
-                if (!isNumeric(enco[i]))
+                if (!esNumeroEnco(enco[i]))
                 {
                     return false;
                 }
@@ -108,7 +120,7 @@ public class Terminal extends javax.swing.JFrame {
         return true;
     }
     
-    private boolean isNumeric(String str)
+    private boolean esNumeroEnco(String str)
     {
         if (str.length() != 6){
             return false;
@@ -210,12 +222,10 @@ public class Terminal extends javax.swing.JFrame {
         if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
             OutputStream out = scorbot.getOutputStream();
             PrintStream printStream = new PrintStream(out);
-            enviado=jTextField1.getText();
-            String enviar = enviado+" \r";
+            String enviar = jTextField1.getText()+" \r";
             printStream.print(enviar);
             printStream.close();
             jTextField1.setText("");
-            env = true;
         }
     }//GEN-LAST:event_jTextField1KeyReleased
 
