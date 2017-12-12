@@ -22,8 +22,8 @@ public class Terminal extends javax.swing.JFrame {
     public SerialPort scorbot;
     private char ser;
     private String pre="";
+    private String enviado="";
     private String[] enco;
-    private boolean flag=false;
     private boolean env=false;
     Thread lectura = new Thread() {
         InputStream in;
@@ -33,32 +33,22 @@ public class Terminal extends javax.swing.JFrame {
            while (true){
                
                try {
+                   
                    ser = (char)in.read();
+                   
+                   if (!enviado.isEmpty())
+                   {
+                        while(!enviado.isEmpty() && enviado.charAt(0) == ser)
+                        {
+                            enviado=enviado.substring(1);
+                            ser = (char)in.read();
+                        }
+                   }
                    
                    if (ser != '\r')
                    {
-                       if ((ser >= '0' && ser <= '9') || ser == '-' || ser == ' ')
-                       {
-                           if (!flag)
-                           {
-                                jTextArea1.setText(jTextArea1.getText()+pre);
-                                pre = "";
-                                pre=pre+ser;
-                                flag=!flag;
-                           }
-                           else
-                           {
-                               pre=pre+ser;
-                           }
-                       }
-                       else
-                       {
-                            pre = pre+ser;
-                            if (flag)
-                            {
-                                flag=!flag;
-                            }
-                       }
+                        if (ser != '>')
+                            pre=pre+ser;
                    }
                    else
                    {
@@ -79,7 +69,8 @@ public class Terminal extends javax.swing.JFrame {
                        }
                        else
                        {
-                           jTextArea1.setText(jTextArea1.getText()+ pre + "\n");
+                           if (!pre.isEmpty())
+                                  jTextArea1.setText(jTextArea1.getText()+ pre + "\n");
                        }
                        pre="";
                        
@@ -125,17 +116,20 @@ public class Terminal extends javax.swing.JFrame {
         return str.matches("-?\\d+(\\.\\d+)?");  //match a number with optional '-' and decimal.
     }
     
+    
+    
     private String[] capturarEnco(String str)
     {
+       
         String[] lista;
         try{
-            if (!Character.isWhitespace(str.charAt(0)))
+            if ( Character.isWhitespace(str.charAt(0)))
             {
-                lista = str.split("\\s+");
+                lista = str.substring(1).split("\\s+");
             }
             else
             {
-                lista = str.substring(1).split("\\s+");
+                lista = str.split("\\s+");
             }
             return lista;
         }catch(StringIndexOutOfBoundsException siobe){
@@ -216,7 +210,8 @@ public class Terminal extends javax.swing.JFrame {
         if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
             OutputStream out = scorbot.getOutputStream();
             PrintStream printStream = new PrintStream(out);
-            String enviar = jTextField1.getText()+" \r";
+            enviado=jTextField1.getText();
+            String enviar = enviado+" \r";
             printStream.print(enviar);
             printStream.close();
             jTextField1.setText("");
