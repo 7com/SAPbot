@@ -23,16 +23,16 @@ public class Adquisicion extends javax.swing.JFrame {
     private char ser;
     private String[] enco,encoAnterior;
     private boolean capturar=false;
+    private boolean running=true;
+    private Terminal t = new Terminal();
     
     Thread lectura = new Thread() {
         InputStream in;
         public void run() {
-           scorbot.openPort();
-           in = scorbot.getInputStream();
-           while (capturar){
-               
-               try 
-               {
+            in = scorbot.getInputStream();
+            while (running){                              
+                try 
+                {
                     ser = (char)in.read();
                     while (ser != '\r')
                     {
@@ -43,28 +43,26 @@ public class Adquisicion extends javax.swing.JFrame {
                     enco=capturarEnco(captura);
                     if (esEnco(enco))
                     {
-                        encoAnterior=enco;
+                        encoAnterior=enco.clone();
                         for(int i=0; i<6; i++)
                         {
-                            //System.out.print(enco[i]+" ");
+                            System.out.print(enco[i]+" ");
                         }
-                       // System.out.println();
+                       System.out.println();
                     }
                     
                     else
                     {
-                        if(encoAnterior.length != 0){
+                        if(encoAnterior != null){
                             for(int i=0; i<6; i++)
                             {
-                                //System.out.print(enco[i]+" ");
+                                System.out.print(encoAnterior[i]+" ");
                             }
-                            // System.out.println();
+                            System.out.println();
                         }
-                        
                         if(!captura.isEmpty())
                         {
-                            String temp = captura.replaceAll("[0-9-]","");
-                            
+                            t.recibir(captura.replaceAll("[0-9-]",""));
                         }
                     }
                     captura="";
@@ -77,10 +75,10 @@ public class Adquisicion extends javax.swing.JFrame {
            }
         }  
     };
+
     
     public Adquisicion() {
         initComponents();
-        
     }   
     
     private boolean esEnco(String[] enco)
@@ -160,6 +158,11 @@ public class Adquisicion extends javax.swing.JFrame {
         jLabel1.setText("Consola de Mensajes:");
 
         jButton1.setText("Iniciar Terminal");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jToggleButton1.setText("Iniciar Captura");
         jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -206,14 +209,14 @@ public class Adquisicion extends javax.swing.JFrame {
     private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
         if (!capturar)
         {
+            capturar=true;
             jToggleButton1.setSelected(true);
             OutputStream out = scorbot.getOutputStream();
             PrintStream printStream = new PrintStream(out);
             String enviar = "show enco \r";
             printStream.print(enviar);
             printStream.close();
-            capturar=true;
-            this.lectura.start();
+            System.out.println("a");
         }
         else
         {
@@ -224,8 +227,15 @@ public class Adquisicion extends javax.swing.JFrame {
             char enviar = (char) 3;
             printStream.print(enviar);
             printStream.close();   
+            System.out.println("b");
         }
     }//GEN-LAST:event_jToggleButton1ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        jButton1.setEnabled(false);
+        t.scorbot=scorbot;
+        t.setVisible(true);
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
