@@ -6,6 +6,12 @@
 package Serial;
 
 import com.fazecast.jSerialComm.SerialPort;
+import java.awt.Color;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -21,15 +27,16 @@ public class Adquisicion extends javax.swing.JFrame {
     public SerialPort scorbot,arduino;
     private String captura="";
     private char ser;
-    private String[] enco,encoAnterior;
+    private String[] enco,encoAnterior,datosArduino;
     private boolean capturar=false;
     private boolean running=true;
     private Terminal t = new Terminal();
     
     Thread lectura = new Thread() {
-        InputStream in;
+        InputStream in,in2;
         public void run() {
             in = scorbot.getInputStream();
+            in = arduino.getInputStream();
             while (running){                              
                 try 
                 {
@@ -40,30 +47,39 @@ public class Adquisicion extends javax.swing.JFrame {
                         ser = (char)in.read();
                     }
                     
-                    enco=capturarEnco(captura);
-                    if (esEnco(enco))
+                    if (capturar)
                     {
-                        encoAnterior=enco.clone();
-                        for(int i=0; i<6; i++)
+                        enco=capturarEnco(captura);
+                        if (esEnco(enco))
                         {
-                            System.out.print(enco[i]+" ");
-                        }
-                       System.out.println();
-                    }
-                    
-                    else
-                    {
-                        if(encoAnterior != null){
+                            encoAnterior=enco.clone();
+                            datosArduino=capturarArduino(in2);
                             for(int i=0; i<6; i++)
                             {
-                                System.out.print(encoAnterior[i]+" ");
+                                System.out.print(enco[i]+" ");
                             }
-                            System.out.println();
+                           System.out.println();
                         }
-                        if(!captura.isEmpty())
+
+                        else
                         {
-                            t.recibir(captura.replaceAll("[0-9-]",""));
+                            if(encoAnterior != null){
+                                datosArduino=capturarArduino(in2);
+                                for(int i=0; i<6; i++)
+                                {
+                                    System.out.print(encoAnterior[i]+" ");
+                                }
+                                System.out.println();
+                            }
+                            if(!captura.isEmpty())
+                            {
+                                t.recibir(captura.replaceAll("[0-9-]",""));
+                            }
                         }
+                    }
+                    else
+                    {
+                        t.recibir(captura);
                     }
                     captura="";
                     
@@ -76,9 +92,38 @@ public class Adquisicion extends javax.swing.JFrame {
         }  
     };
 
+    private String[] capturarArduino(InputStream in) throws IOException{
+        //Capturar 3 valores, voltaje calculado, frequencia pwm, temperatura desde arduino
+        char c = (char)in.read();
+        String str="";
+        while (c != '\r')
+        {
+            str=str+c;
+            c = (char)in.read();
+        }
+        return str.split(",");
+    }
+    
+    WindowListener exitListener = new WindowAdapter() {
+    @Override
+    public void windowClosing(WindowEvent e) {
+        jButton1.setEnabled(true);
+    }
+    };
+    
+    @Override
+    public Image getIconImage() {
+        Image retValue = Toolkit.getDefaultToolkit().
+                getImage(ClassLoader.getSystemResource("Imagenes/icon.png"));
+
+
+        return retValue;
+    }
     
     public Adquisicion() {
         initComponents();
+        t.addWindowListener(exitListener);
+        this.getContentPane().setBackground(Color.white);
     }   
     
     private boolean esEnco(String[] enco)
@@ -148,9 +193,11 @@ public class Adquisicion extends javax.swing.JFrame {
         jLabel2.setText("jLabel2");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Servicio de Adquisición de Parámetros Scorbot");
+        setTitle("Sistema de Adquisición de Parámetros Scorbot");
         setBackground(new java.awt.Color(255, 255, 255));
+        setIconImage(getIconImage());
 
+        jTextArea1.setEditable(false);
         jTextArea1.setColumns(20);
         jTextArea1.setRows(5);
         jScrollPane1.setViewportView(jTextArea1);

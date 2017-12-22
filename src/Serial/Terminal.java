@@ -6,6 +6,9 @@
 package Serial;
 
 import com.fazecast.jSerialComm.SerialPort;
+import java.awt.Color;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -27,8 +30,18 @@ public class Terminal extends javax.swing.JFrame {
     
     public Terminal() {
         initComponents();
+        this.getContentPane().setBackground(Color.white);
     }
+    
+    @Override
+    public Image getIconImage() {
+        Image retValue = Toolkit.getDefaultToolkit().
+                getImage(ClassLoader.getSystemResource("Imagenes/icon.png"));
 
+
+        return retValue;
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -42,8 +55,9 @@ public class Terminal extends javax.swing.JFrame {
         jTextArea1 = new javax.swing.JTextArea();
         jTextField1 = new javax.swing.JTextField();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Terminal SAPBot");
         setBackground(new java.awt.Color(255, 255, 255));
+        setIconImage(getIconImage());
 
         jTextArea1.setEditable(false);
         jTextArea1.setColumns(20);
