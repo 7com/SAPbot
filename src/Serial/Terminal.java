@@ -58,6 +58,7 @@ public class Terminal extends javax.swing.JFrame {
         setTitle("Terminal SAPBot");
         setBackground(new java.awt.Color(255, 255, 255));
         setIconImage(getIconImage());
+        setResizable(false);
 
         jTextArea1.setEditable(false);
         jTextArea1.setColumns(20);
@@ -87,10 +88,10 @@ public class Terminal extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 282, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         pack();
@@ -101,7 +102,7 @@ public class Terminal extends javax.swing.JFrame {
         if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
             OutputStream out = scorbot.getOutputStream();
             PrintStream printStream = new PrintStream(out);
-            String enviar = jTextField1.getText()+" \r";
+            String enviar = jTextField1.getText()+"\r";
             printStream.print(enviar);
             printStream.close();
             jTextField1.setText("");

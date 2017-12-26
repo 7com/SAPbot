@@ -43,8 +43,8 @@ public class MenuConfiguracion extends javax.swing.JFrame {
         }
         for(int i=0; i<comPort.length ; i++)
         {
-            jComboBox1.addItem(new ComboItem(comPort[i].getSystemPortName(),comPort[i]));
-            jComboBox2.addItem(new ComboItem(comPort[i].getSystemPortName(),comPort[i]));
+            jComboBox1.addItem(new ComboItem(comPort[i].getDescriptivePortName(),comPort[i]));
+            jComboBox2.addItem(new ComboItem(comPort[i].getDescriptivePortName(),comPort[i]));
         }
         
     }
@@ -69,6 +69,7 @@ public class MenuConfiguracion extends javax.swing.JFrame {
         setTitle("Sistema de Adquisición de Parámetros Scorbot");
         setBackground(new java.awt.Color(255, 255, 255));
         setIconImage(getIconImage());
+        setResizable(false);
 
         jComboBox1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

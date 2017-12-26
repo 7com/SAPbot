@@ -12,6 +12,9 @@ import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -27,17 +30,19 @@ public class Adquisicion extends javax.swing.JFrame {
     public SerialPort scorbot,arduino;
     private String captura="";
     private char ser;
-    private String[] enco,encoAnterior,datosArduino;
+    private String[] enco,encoAnterior;
+    private String datosArduino;
     private boolean capturar=false;
-    private boolean running=true;
     private Terminal t = new Terminal();
+    private String ruta="";
     
     Thread lectura = new Thread() {
         InputStream in,in2;
         public void run() {
             in = scorbot.getInputStream();
-            in = arduino.getInputStream();
-            while (running){                              
+            in2 = arduino.getInputStream();
+            jTextArea1.setText("Listo.\n\n");
+            while (true){                              
                 try 
                 {
                     ser = (char)in.read();
@@ -46,7 +51,6 @@ public class Adquisicion extends javax.swing.JFrame {
                         captura=captura+ser;
                         ser = (char)in.read();
                     }
-                    
                     if (capturar)
                     {
                         enco=capturarEnco(captura);
@@ -54,22 +58,14 @@ public class Adquisicion extends javax.swing.JFrame {
                         {
                             encoAnterior=enco.clone();
                             datosArduino=capturarArduino(in2);
-                            for(int i=0; i<6; i++)
-                            {
-                                System.out.print(enco[i]+" ");
-                            }
-                           System.out.println();
+                            System.out.println(escribir(encoAnterior,datosArduino));
                         }
 
                         else
                         {
-                            if(encoAnterior != null){
-                                datosArduino=capturarArduino(in2);
-                                for(int i=0; i<6; i++)
-                                {
-                                    System.out.print(encoAnterior[i]+" ");
-                                }
-                                System.out.println();
+                            if(encoAnterior != null)
+                            {
+                                System.out.println(escribir(encoAnterior,datosArduino));
                             }
                             if(!captura.isEmpty())
                             {
@@ -92,16 +88,49 @@ public class Adquisicion extends javax.swing.JFrame {
         }  
     };
 
-    private String[] capturarArduino(InputStream in) throws IOException{
+    private boolean escribir(String[] e,String a)
+    {
+        try
+        {
+            File archivo = new File(ruta);
+            BufferedWriter bw;
+            String s="";
+            for (int i=0;i<6;i++)
+            {
+                if(i==5)
+                    s=s+e[i]+";";
+                else
+                    s=s+e[i]+",";
+            }
+            s=s+a;
+            if(archivo.exists()) {
+                bw = new BufferedWriter(new FileWriter(archivo, true));
+                bw.write("\n"+s);
+            } else {
+                bw = new BufferedWriter(new FileWriter(archivo));
+                bw.write(s);
+            }
+            bw.close();
+            return true;
+        } catch (IOException ex){
+            return false;
+        }
+    }
+    
+    private String capturarArduino(InputStream in) throws IOException{
         //Capturar 3 valores, voltaje calculado, frequencia pwm, temperatura desde arduino
-        char c = (char)in.read();
         String str="";
+        OutputStream out = arduino.getOutputStream();
+        PrintStream printStream = new PrintStream(out);
+        printStream.print("\n");   
+        char c = (char)in.read();
         while (c != '\r')
         {
             str=str+c;
             c = (char)in.read();
         }
-        return str.split(",");
+        printStream.close();
+        return str;
     }
     
     WindowListener exitListener = new WindowAdapter() {
@@ -196,6 +225,7 @@ public class Adquisicion extends javax.swing.JFrame {
         setTitle("Sistema de Adquisición de Parámetros Scorbot");
         setBackground(new java.awt.Color(255, 255, 255));
         setIconImage(getIconImage());
+        setResizable(false);
 
         jTextArea1.setEditable(false);
         jTextArea1.setColumns(20);
@@ -256,25 +286,30 @@ public class Adquisicion extends javax.swing.JFrame {
     private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
         if (!capturar)
         {
-            capturar=true;
-            jToggleButton1.setSelected(true);
-            OutputStream out = scorbot.getOutputStream();
-            PrintStream printStream = new PrintStream(out);
-            String enviar = "show enco \r";
-            printStream.print(enviar);
-            printStream.close();
-            System.out.println("a");
+            ruta=JOptionPane.showInputDialog("Nombre de la prueba")+".txt";
+            if (ruta!=null)
+            {
+                capturar=true;
+                jToggleButton1.setSelected(true);
+                OutputStream out = scorbot.getOutputStream();
+                PrintStream printStream = new PrintStream(out);
+                String enviar = "show enco\r";
+                printStream.print(enviar);
+                printStream.close();
+                jTextArea1.setText(jTextArea1.getText()+"Capturando prueba en: "+ruta+"\n");
+            }
         }
         else
         {
             capturar=false;
+            ruta=null;
             jToggleButton1.setSelected(false);
             OutputStream out = scorbot.getOutputStream();
             PrintStream printStream = new PrintStream(out);
             char enviar = (char) 3;
             printStream.print(enviar);
             printStream.close();   
-            System.out.println("b");
+            jTextArea1.setText(jTextArea1.getText()+"Prueba Finalizada."+"\n\n");
         }
     }//GEN-LAST:event_jToggleButton1ActionPerformed
 
