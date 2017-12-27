@@ -58,19 +58,33 @@ public class Adquisicion extends javax.swing.JFrame {
                         {
                             encoAnterior=enco.clone();
                             datosArduino=capturarArduino(in2);
-                            System.out.println(escribir(encoAnterior,datosArduino));
+                            if(!escribir(encoAnterior,datosArduino))
+                                jTextArea1.setText(jTextArea1.getText()+"Error al Escribir Archivo: "+ruta+".txt/n");
                         }
 
                         else
                         {
-                            if(encoAnterior != null)
-                            {
-                                System.out.println(escribir(encoAnterior,datosArduino));
-                            }
                             if(!captura.isEmpty())
                             {
+                                enco=capturarEnco(captura.replaceAll("[^0-9-]", ""));
+                                if (esEnco(enco))
+                                {
+                                    encoAnterior=enco.clone();
+                                    datosArduino=capturarArduino(in2);
+                                    if(!escribir(encoAnterior,datosArduino))
+                                        jTextArea1.setText(jTextArea1.getText()+"Error al Escribir Archivo: "+ruta+".txt/n");
+                                }
                                 t.recibir(captura.replaceAll("[0-9-]",""));
                             }
+                            else
+                            {
+                                if(encoAnterior != null)
+                                {
+                                    if(!escribir(encoAnterior,datosArduino))
+                                        jTextArea1.setText(jTextArea1.getText()+"Error al Escribir Archivo: "+ruta+".txt/n");
+                                }   
+                            }
+                            
                         }
                     }
                     else
@@ -286,23 +300,39 @@ public class Adquisicion extends javax.swing.JFrame {
     private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
         if (!capturar)
         {
-            ruta=JOptionPane.showInputDialog("Nombre de la prueba")+".txt";
-            if (ruta!=null)
+            String tmp="";
+            do
             {
-                capturar=true;
-                jToggleButton1.setSelected(true);
-                OutputStream out = scorbot.getOutputStream();
-                PrintStream printStream = new PrintStream(out);
-                String enviar = "show enco\r";
-                printStream.print(enviar);
-                printStream.close();
-                jTextArea1.setText(jTextArea1.getText()+"Capturando prueba en: "+ruta+"\n");
+                tmp=JOptionPane.showInputDialog("Nombre de la prueba");
+                if (!tmp.matches("^[A-Za-z0-9 _-]*$"))
+                    JOptionPane.showMessageDialog(null,"El nombre solo puede poseer letras, números, espacios y guiones.","Error",JOptionPane.INFORMATION_MESSAGE);
+            }while(!tmp.matches("^[A-Za-z0-9 _-]*$"));
+            ruta=tmp+".txt";
+            if(!ruta.equals("null.txt"))
+            {
+                if (!ruta.equals(".txt"))
+                {
+                    capturar=true;
+                    jToggleButton1.setSelected(true);
+                    OutputStream out = scorbot.getOutputStream();
+                    PrintStream printStream = new PrintStream(out);
+                    String enviar = "show enco\r";
+                    printStream.print(enviar);
+                    printStream.close();
+                    jTextArea1.setText(jTextArea1.getText()+"Capturando prueba en: "+ruta+"\n");
+                }
+                else
+                {
+                    jToggleButton1.setSelected(false);
+                    JOptionPane.showMessageDialog(null,"Se debe ingresar nombre de prueba.","Error",JOptionPane.INFORMATION_MESSAGE);
+                }
             }
+            else
+                jToggleButton1.setSelected(false);
         }
         else
         {
             capturar=false;
-            ruta=null;
             jToggleButton1.setSelected(false);
             OutputStream out = scorbot.getOutputStream();
             PrintStream printStream = new PrintStream(out);
