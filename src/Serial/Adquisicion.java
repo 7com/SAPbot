@@ -314,6 +314,7 @@ public class Adquisicion extends javax.swing.JFrame {
                 {
                     capturar=true;
                     jToggleButton1.setSelected(true);
+                    jToggleButton1.setText("Finalizar Captura");
                     OutputStream out = scorbot.getOutputStream();
                     PrintStream printStream = new PrintStream(out);
                     String enviar = "show enco\r";
@@ -334,6 +335,7 @@ public class Adquisicion extends javax.swing.JFrame {
         {
             capturar=false;
             jToggleButton1.setSelected(false);
+            jToggleButton1.setText("Iniciar Captura");
             OutputStream out = scorbot.getOutputStream();
             PrintStream printStream = new PrintStream(out);
             char enviar = (char) 3;
