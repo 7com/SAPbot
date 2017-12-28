@@ -38,21 +38,20 @@ public class MenuConfiguracion extends javax.swing.JFrame {
     public void cargarPuertos(){
         if (comPort.length == 0){
             JOptionPane.showMessageDialog(this,"No hay puertos seriales detectados.","Error",JOptionPane.ERROR_MESSAGE);
-
-            System.exit(1);
+            jButton1.setEnabled(false);
         }
         else 
         {
             if (comPort.length < 2){
                 JOptionPane.showMessageDialog(this,"Falta un conectar dispositivo.","Error",JOptionPane.ERROR_MESSAGE);
-
-                System.exit(1);
+                jButton1.setEnabled(false);
             }
         }
         for(int i=0; i<comPort.length ; i++)
         {
             jComboBox1.addItem(new ComboItem(comPort[i].getDescriptivePortName(),comPort[i]));
             jComboBox2.addItem(new ComboItem(comPort[i].getDescriptivePortName(),comPort[i]));
+            jButton1.setEnabled(true);
         }
     }
     
