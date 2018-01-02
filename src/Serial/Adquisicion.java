@@ -304,6 +304,8 @@ public class Adquisicion extends javax.swing.JFrame {
             do
             {
                 tmp=JOptionPane.showInputDialog("Nombre de la prueba");
+                if (tmp == null)
+                    tmp="null";
                 if (!tmp.matches("^[A-Za-z0-9 _-]*$"))
                     JOptionPane.showMessageDialog(null,"El nombre solo puede poseer letras, números, espacios y guiones.","Error",JOptionPane.INFORMATION_MESSAGE);
             }while(!tmp.matches("^[A-Za-z0-9 _-]*$"));
