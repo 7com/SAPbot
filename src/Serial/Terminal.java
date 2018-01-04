@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Serial;
 
 import com.fazecast.jSerialComm.SerialPort;
@@ -13,15 +8,12 @@ import java.awt.event.KeyEvent;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
-/**
- *
- * @author fivc
- */
 public class Terminal extends javax.swing.JFrame {
     
     public SerialPort scorbot;
     
-    
+    //La función recibe un String s y agrega su texto al jTextArea1
+    //sin perder el texto que se encuentre previamente. 
     public void recibir(String s)
     {
         jTextArea1.setText(jTextArea1.getText()+s+"\n");
@@ -33,6 +25,7 @@ public class Terminal extends javax.swing.JFrame {
         this.getContentPane().setBackground(Color.white);
     }
     
+    //Función para configurar el ícono de la ventana.
     @Override
     public Image getIconImage() {
         Image retValue = Toolkit.getDefaultToolkit().
@@ -98,6 +91,9 @@ public class Terminal extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    //Evento para el jTextField1. Su funcionalidad es recuperar el texto
+    //en él y enviarlo hacia el controlador Scorbot al presionar la tecla Enter.
+    //Una vez enviado el texto, el campo se vacía
     private void jTextField1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyReleased
         if(evt.getKeyCode() == KeyEvent.VK_ENTER) {
             OutputStream out = scorbot.getOutputStream();

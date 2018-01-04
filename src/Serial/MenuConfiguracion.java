@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Serial;
 
 import com.fazecast.jSerialComm.SerialPort;
@@ -11,21 +6,16 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import javax.swing.JOptionPane;
 
-/**
- *
- * @author fivc
- */
 public class MenuConfiguracion extends javax.swing.JFrame {
 
     private SerialPort comPort[] = SerialPort.getCommPorts();
-    /**
-     * Creates new form MenuConfiguracion
-     */
+
     public MenuConfiguracion() {
         initComponents();
         this.getContentPane().setBackground(Color.white);
     }
-
+    
+    //Función para configurar el ícono de la ventana.
     @Override
     public Image getIconImage() {
         Image retValue = Toolkit.getDefaultToolkit().
@@ -35,6 +25,10 @@ public class MenuConfiguracion extends javax.swing.JFrame {
         return retValue;
     }
     
+    //La función cargarPuertos() se dedica a cargar los puertos seriales del
+    //sistema y agregarlos a los jComboBox correspondientes. La función envía un
+    //error en caso de no tener el mínimo de puertos necesarios para funcionar
+    //(2 puertos seriales).
     public void cargarPuertos(){
         if (comPort.length == 0){
             JOptionPane.showMessageDialog(this,"No hay puertos seriales detectados.","Error",JOptionPane.ERROR_MESSAGE);
@@ -43,7 +37,7 @@ public class MenuConfiguracion extends javax.swing.JFrame {
         else 
         {
             if (comPort.length < 2){
-                JOptionPane.showMessageDialog(this,"Falta un conectar dispositivo.","Error",JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this,"El sistema requiere al menos 2 puertos seriales para funcionar.","Error",JOptionPane.ERROR_MESSAGE);
                 jButton1.setEnabled(false);
             }
         }
@@ -78,6 +72,9 @@ public class MenuConfiguracion extends javax.swing.JFrame {
         setIconImage(getIconImage());
         setResizable(false);
 
+        jComboBox1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+
+        jButton1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jButton1.setText("Iniciar");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -85,12 +82,17 @@ public class MenuConfiguracion extends javax.swing.JFrame {
             }
         });
 
+        jLabel1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel1.setText("Puerto Controlador:");
 
+        jComboBox2.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+
+        jLabel2.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel2.setText("Puerto Arduino Mega:");
 
         jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/Logo.png"))); // NOI18N
 
+        jButton2.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jButton2.setText("Recargar Puertos");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -147,13 +149,15 @@ public class MenuConfiguracion extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    //Evento encargado de verificar que los puertos seleccionados no se encuentren
+    //en uso por alguna aplicación en el sistema o que se eligiera el mismo puerto
+    //tanto para el arduino como para el controlador del Scorbot
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         ComboItem i = (ComboItem)jComboBox1.getSelectedItem();
         ComboItem j = (ComboItem)jComboBox2.getSelectedItem();
         
         if (i.getPuerto() != j.getPuerto())
-        //if(true)
         {
             if (i.getPuerto().openPort())
             {
@@ -178,6 +182,7 @@ public class MenuConfiguracion extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    //Evento para recargar los puertos en los jComboBox
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         comPort = SerialPort.getCommPorts();
@@ -197,6 +202,8 @@ public class MenuConfiguracion extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 }
 
+//Clase ComboIteam para utilizar en los jComboBox que contiene la descripción
+//del puerto serial y el objeto SerialPort correspondiente a él.
 class ComboItem
 {
     private String key;

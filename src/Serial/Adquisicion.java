@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Serial;
 
 import com.fazecast.jSerialComm.SerialPort;
@@ -19,40 +14,48 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javax.swing.JOptionPane;
 
-/**
- *
- * @author fivc
- */
 public class Adquisicion extends javax.swing.JFrame {
 
     public SerialPort scorbot,arduino;
-    private String captura="";
+    private String captura;
     private char ser;
     private String[] enco,encoAnterior;
     private String datosArduino;
-    private boolean capturar=false;
-    private Terminal t = new Terminal();
-    private String ruta="";
+    private boolean capturar;
+    private Terminal t;
+    private String ruta;
+    private final ExecutorService exec;
     
+    //Hilo dedicado a la captura de datos del controlador Scorbot.
+    //El hilo toma los datos enconder válidos y los guarda en un archivo .txt con el
+    //nombre de la prueba previamente indicado por el usuario.
+    //Los datos que no sean parte de los encoder son enviados a la terminal del sistema.
     Thread lectura = new Thread() {
         InputStream in,in2;
         public void run() {
-            in = scorbot.getInputStream();
-            in2 = arduino.getInputStream();
-            jTextArea1.setText("Listo.\n\n");
+            in = scorbot.getInputStream(); //Obtiene canal de Entrada del Controlador Scorbot-
+            in2 = arduino.getInputStream(); //Obtiene canal de Entrada del Arduino Mega.
+            jTextArea1.setText("Listo.\n\n"); 
             while (true){                              
                 try 
                 {
+                    //Recibe los datos por serial del controlador y los guarda
+                    //en el string captura. Los datos son guardados en captura
+                    //hasta que se reciba un retorno de carro (\r).
                     ser = (char)in.read();
                     while (ser != '\r')
                     {
                         captura=captura+ser;
                         ser = (char)in.read();
                     }
+                    //Si se inició la prueba (capturar == true).
                     if (capturar)
                     {
+                        //Se procesa el String para validar si es un valor de encoder válido.
                         enco=capturarEnco(captura);
                         if (esEnco(enco))
                         {
@@ -61,7 +64,10 @@ public class Adquisicion extends javax.swing.JFrame {
                             if(!escribir(encoAnterior,datosArduino))
                                 jTextArea1.setText(jTextArea1.getText()+"Error al Escribir Archivo: "+ruta+".txt/n");
                         }
-
+                        
+                        //Si el encoder no es válido, se trata de limpiar el string
+                        //de cualquier carácter no valido para el encoder y se vuelve a probar.
+                        //En caso de no ser válido, se utilizan los valores previamente validados.
                         else
                         {
                             if(!captura.isEmpty())
@@ -74,6 +80,10 @@ public class Adquisicion extends javax.swing.JFrame {
                                     if(!escribir(encoAnterior,datosArduino))
                                         jTextArea1.setText(jTextArea1.getText()+"Error al Escribir Archivo: "+ruta+".txt/n");
                                 }
+                                //Se elimina los números y el signo - del string y el valor resultante se envía
+                                //al terminal. Usualmente los mensajes enviados en esta etapa son respuestas de los
+                                //comandos enviados por el usuario por medio de la terminal u avisos generados por
+                                //el controlador (por ejemplo: en caso de alcanzar el límite máximo de movimiento del eje).
                                 t.recibir(captura.replaceAll("[0-9-]",""));
                             }
                             else
@@ -87,10 +97,13 @@ public class Adquisicion extends javax.swing.JFrame {
                             
                         }
                     }
+                    //En caso de no estar capturando, todos los caracteres recibidos
+                    //son enviados al terminal.
                     else
                     {
                         t.recibir(captura);
                     }
+                    //Se limpia el string captura para reiniciar el proceso de captura.
                     captura="";
                     
                     
@@ -102,6 +115,7 @@ public class Adquisicion extends javax.swing.JFrame {
         }  
     };
 
+    //Función dedicada a crear el archivo de texto que contiene los datos de la prueba.
     private boolean escribir(String[] e,String a)
     {
         try
@@ -131,8 +145,9 @@ public class Adquisicion extends javax.swing.JFrame {
         }
     }
     
+    //Función dedicada a pedir y capturar los datos de los sensores conectados al
+    //Arduino Mega.
     private String capturarArduino(InputStream in) throws IOException{
-        //Capturar 3 valores, voltaje calculado, frequencia pwm, temperatura desde arduino
         String str="";
         OutputStream out = arduino.getOutputStream();
         PrintStream printStream = new PrintStream(out);
@@ -147,13 +162,7 @@ public class Adquisicion extends javax.swing.JFrame {
         return str;
     }
     
-    WindowListener exitListener = new WindowAdapter() {
-    @Override
-    public void windowClosing(WindowEvent e) {
-        jButton1.setEnabled(true);
-    }
-    };
-    
+    //Función para configurar el ícono de la ventana.
     @Override
     public Image getIconImage() {
         Image retValue = Toolkit.getDefaultToolkit().
@@ -163,12 +172,27 @@ public class Adquisicion extends javax.swing.JFrame {
         return retValue;
     }
     
+    //Se crea evento exitListener para entregárselo a la ventana de Terminal.
+    //Remplaza la función del botón cerrar para que vuelva a activar el botón "Iniciar Terminal"
+    WindowListener exitListener = new WindowAdapter() {
+    @Override
+    public void windowClosing(WindowEvent e) {
+        jButton1.setEnabled(true);
+    }
+    };
+    
     public Adquisicion() {
+        this.captura = "";
+        this.capturar = false;
+        this.t = new Terminal();
+        this.ruta = "";
+        this.exec = Executors.newFixedThreadPool(10);
         initComponents();
-        t.addWindowListener(exitListener);
+        t.addWindowListener(exitListener); //Se agrega exitListener previamente creado a la ventana Terminal
         this.getContentPane().setBackground(Color.white);
     }   
     
+    //Función para detectar si el texto ingresado es un dato encoder valido.
     private boolean esEnco(String[] enco)
     {
         if (enco.length != 6)
@@ -187,6 +211,7 @@ public class Adquisicion extends javax.swing.JFrame {
         return true;
     }
     
+    //Verifica si el número recibido es un número encoder valido
     private boolean esNumeroEnco(String str)
     {
         if (str.length() != 6){
@@ -196,7 +221,7 @@ public class Adquisicion extends javax.swing.JFrame {
     }
     
     
-    
+    //Prepara el String Captura para ser utilizado en la función esEnco()
     private String[] capturarEnco(String str)
     {
        
@@ -246,8 +271,10 @@ public class Adquisicion extends javax.swing.JFrame {
         jTextArea1.setRows(5);
         jScrollPane1.setViewportView(jTextArea1);
 
+        jLabel1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel1.setText("Consola de Mensajes:");
 
+        jButton1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jButton1.setText("Iniciar Terminal");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -255,6 +282,7 @@ public class Adquisicion extends javax.swing.JFrame {
             }
         });
 
+        jToggleButton1.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jToggleButton1.setText("Iniciar Captura");
         jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -275,7 +303,7 @@ public class Adquisicion extends javax.swing.JFrame {
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jToggleButton1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 132, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 136, Short.MAX_VALUE)
                         .addComponent(jButton1)))
                 .addContainerGap())
         );
@@ -297,10 +325,16 @@ public class Adquisicion extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    //Evento para iniciar o finalizar la captura de la prueba. Envía comandos al
+    //controlador para iniciar el envío de los valores de los enconders o para finalizar
+    //su envío.
     private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
         if (!capturar)
         {
             String tmp="";
+            //Dentro del do while, se crea una ventana emergente donde el usuario
+            //puede indicar el nombre para la prueba. Si el nombre es válido,
+            //se iniciara automáticamente la captura de datos.
             do
             {
                 tmp=JOptionPane.showInputDialog("Nombre de la prueba");
@@ -347,6 +381,7 @@ public class Adquisicion extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jToggleButton1ActionPerformed
 
+    //Evento para mostrar el terminal al controlador Scorbot.
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         jButton1.setEnabled(false);
         t.scorbot=scorbot;
