@@ -4,6 +4,9 @@ import com.fazecast.jSerialComm.SerialPort;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import javax.swing.JOptionPane;
 
 public class MenuConfiguracion extends javax.swing.JFrame {

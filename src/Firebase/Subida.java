@@ -1,5 +1,6 @@
 package Firebase;
 
+import Serial.Adquisicion;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.database.DatabaseReference;
@@ -16,16 +17,20 @@ import javax.swing.JOptionPane;
 
 public class Subida implements Runnable {
     private String ruta, nombre;
-    
-    public void Subida(String s, String n){
+    private Adquisicion a;
+    private File f;
+
+    public Subida(String s, String n, Adquisicion a) {
         ruta=s;
         nombre=n;
+        this.a=a;
     }
+
     
     public void Lectura (){
         //Hace referencia a la base de datos y las credenciales de datos
         String BD_URL = "https://sapbot-001.firebaseio.com/";
-        String CREDENCIALES = "C:/Credencial SAPBot.json";
+        String CREDENCIALES = "Credencial SAPBot.json";
         
         try {
             FirebaseOptions options = new FirebaseOptions.Builder()
@@ -43,7 +48,7 @@ public class Subida implements Runnable {
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         final DatabaseReference ref = database.getReferenceFromUrl(BD_URL);
         
-        File f = new File(ruta);
+        f = new File(ruta);
         //File f = new File("C:/Users/Hugo/Desktop/SAPbot-master/prueba.txt");
         StringTokenizer tok1;
         Scanner entrada = null;
@@ -270,12 +275,15 @@ public class Subida implements Runnable {
             act23.setValue(tem5);
             DatabaseReference act24 = re5.child("Motor 6");
             act24.setValue(tem6);
+            a.consolaTXT("La prueba "+nombre+" se ha subido a exitosamente a Firebase.");
             
         } catch (FileNotFoundException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
             } 
             finally {
                  entrada.close();
+                 while(!f.delete())
+                     System.out.println("Reintentando Borrar "+ruta);
             } 
     }
                     

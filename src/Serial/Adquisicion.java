@@ -1,5 +1,6 @@
 package Serial;
 
+import Firebase.Subida;
 import com.fazecast.jSerialComm.SerialPort;
 import java.awt.Color;
 import java.awt.Image;
@@ -25,6 +26,7 @@ public class Adquisicion extends javax.swing.JFrame {
     private char ser;
     private String[] enco,encoAnterior;
     private String datosArduino;
+    private String nombreP;
     private boolean capturar;
     private Terminal t;
     private String ruta;
@@ -190,7 +192,24 @@ public class Adquisicion extends javax.swing.JFrame {
         initComponents();
         t.addWindowListener(exitListener); //Se agrega exitListener previamente creado a la ventana Terminal
         this.getContentPane().setBackground(Color.white);
+        this.addWindowListener(cerrarSistema);
     }   
+    
+    //Se crea evento cerrarSistema para entregárselo a la ventana de Adquisición.
+                    //Remplaza la función del botón cerrar para que vuelva a activar el botón "Iniciar Terminal"
+                    WindowListener cerrarSistema = new WindowAdapter() {
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        jButton1.setEnabled(false);
+                        jToggleButton1.setEnabled(false);
+                        consolaTXT("Cerrando Sistema...");
+                        consolaTXT("Finalizando Hilos de Subida");
+                        exec.shutdown();
+                        while (!exec.isTerminated()) {
+                        }
+                        System.exit(0);
+                    }
+                    };
     
     //Función para detectar si el texto ingresado es un dato encoder valido.
     private boolean esEnco(String[] enco)
@@ -241,7 +260,10 @@ public class Adquisicion extends javax.swing.JFrame {
         }
     }
     
-
+    public void consolaTXT(String s)
+    {
+        jTextArea1.setText(jTextArea1.getText()+s+"\n");
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -260,7 +282,7 @@ public class Adquisicion extends javax.swing.JFrame {
 
         jLabel2.setText("jLabel2");
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Sistema de Adquisición de Parámetros Scorbot");
         setBackground(new java.awt.Color(255, 255, 255));
         setIconImage(getIconImage());
@@ -344,6 +366,7 @@ public class Adquisicion extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(null,"El nombre solo puede poseer letras, números, espacios y guiones.","Error",JOptionPane.INFORMATION_MESSAGE);
             }while(!tmp.matches("^[A-Za-z0-9 _-]*$"));
             ruta=tmp+".txt";
+            nombreP=tmp;
             if(!ruta.equals("null.txt"))
             {
                 if (!ruta.equals(".txt"))
@@ -378,7 +401,7 @@ public class Adquisicion extends javax.swing.JFrame {
             printStream.print(enviar);
             printStream.close();   
             jTextArea1.setText(jTextArea1.getText()+"Prueba Finalizada."+"\n\n");
-            
+            exec.submit(new Subida(ruta,nombreP,this));
         }
     }//GEN-LAST:event_jToggleButton1ActionPerformed
 
