@@ -378,6 +378,7 @@ public class Adquisicion extends javax.swing.JFrame {
             printStream.print(enviar);
             printStream.close();   
             jTextArea1.setText(jTextArea1.getText()+"Prueba Finalizada."+"\n\n");
+            
         }
     }//GEN-LAST:event_jToggleButton1ActionPerformed
 

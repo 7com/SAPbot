@@ -15,10 +15,11 @@ import java.util.StringTokenizer;
 import javax.swing.JOptionPane;
 
 public class Subida implements Runnable {
-    private String ruta;
+    private String ruta, nombre;
     
-    public void Subida(String s){
+    public void Subida(String s, String n){
         ruta=s;
+        nombre=n;
     }
     
     public void Lectura (){
@@ -211,7 +212,7 @@ public class Subida implements Runnable {
             //Referencias generales de la base de datos
             Calendar c1 = GregorianCalendar.getInstance();
             String c2 = c1.getTime().toLocaleString();
-            DatabaseReference re = ref.child("Prueba X");//Cambiar por nombre txt despues
+            DatabaseReference re = ref.child(nombre);//Cambiar por nombre txt despues
             DatabaseReference re1 = re.child(c2);
             //Envio datos posicion
             DatabaseReference re2 = re1.child("Posicion");
@@ -283,7 +284,7 @@ public class Subida implements Runnable {
     public void run() {
         //throw new UnsupportedOperationException("Not supported yet.");
         //To change body of generated methods, choose Tools | Templates.
-        
+        Lectura();
     }
     
 }
