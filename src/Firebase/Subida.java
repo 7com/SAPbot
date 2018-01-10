@@ -19,8 +19,10 @@ public class Subida implements Runnable {
     private String ruta, nombre;
     private Adquisicion a;
     private File f;
+    private boolean inicializado;
 
     public Subida(String s, String n, Adquisicion a) {
+        this.inicializado = false;
         ruta=s;
         nombre=n;
         this.a=a;
@@ -31,19 +33,22 @@ public class Subida implements Runnable {
         //Hace referencia a la base de datos y las credenciales de datos
         String BD_URL = "https://sapbot-001.firebaseio.com/";
         String CREDENCIALES = "Credencial SAPBot.json";
-        
-        try {
-            FirebaseOptions options = new FirebaseOptions.Builder()
-                    .setServiceAccount(new FileInputStream(CREDENCIALES))
-                    .setDatabaseUrl(BD_URL)
-                    .build();
-            FirebaseApp.initializeApp(options);
-            //La siguiente linea muestra los errores por consola
-            //FirebaseDatabase.getInstance().setLogLevel(com.google.firebase.database.Logger.Level.DEBUG);
-        } catch (FileNotFoundException e) {
-            JOptionPane.showMessageDialog(null, e.getMessage());
+        try{
+             FirebaseApp.getInstance();
+        }catch (IllegalStateException ex)
+        {
+            try {
+                FirebaseOptions options = new FirebaseOptions.Builder()
+                        .setServiceAccount(new FileInputStream(CREDENCIALES))
+                        .setDatabaseUrl(BD_URL)
+                        .build();
+                FirebaseApp.initializeApp(options);
+                //La siguiente linea muestra los errores por consola
+                //FirebaseDatabase.getInstance().setLogLevel(com.google.firebase.database.Logger.Level.DEBUG);
+            } catch (FileNotFoundException e) {
+                JOptionPane.showMessageDialog(null, e.getMessage());
+            }
         }
-        
         //Permite referenciar a la base de datos para poder enviar los datos
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         final DatabaseReference ref = database.getReferenceFromUrl(BD_URL);

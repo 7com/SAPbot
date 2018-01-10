@@ -38,6 +38,7 @@ public class Adquisicion extends javax.swing.JFrame {
     //Los datos que no sean parte de los encoder son enviados a la terminal del sistema.
     Thread lectura = new Thread() {
         InputStream in,in2;
+        @Override
         public void run() {
             in = scorbot.getInputStream(); //Obtiene canal de Entrada del Controlador Scorbot-
             in2 = arduino.getInputStream(); //Obtiene canal de Entrada del Arduino Mega.
@@ -188,7 +189,7 @@ public class Adquisicion extends javax.swing.JFrame {
         this.capturar = false;
         this.t = new Terminal();
         this.ruta = "";
-        this.exec = Executors.newFixedThreadPool(10);
+        this.exec = Executors.newFixedThreadPool(5);
         initComponents();
         t.addWindowListener(exitListener); //Se agrega exitListener previamente creado a la ventana Terminal
         this.getContentPane().setBackground(Color.white);
@@ -401,7 +402,7 @@ public class Adquisicion extends javax.swing.JFrame {
             printStream.print(enviar);
             printStream.close();   
             jTextArea1.setText(jTextArea1.getText()+"Prueba Finalizada."+"\n\n");
-            exec.submit(new Subida(ruta,nombreP,this));
+            exec.execute(new Subida(ruta,nombreP,this));
         }
     }//GEN-LAST:event_jToggleButton1ActionPerformed
 
