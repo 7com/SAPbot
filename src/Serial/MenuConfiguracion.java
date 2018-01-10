@@ -67,7 +67,7 @@ public class MenuConfiguracion extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Sistema de Adquisición de Parámetros Scorbot");
+        setTitle("SAPBot");
         setBackground(new java.awt.Color(255, 255, 255));
         setIconImage(getIconImage());
         setResizable(false);

@@ -284,7 +284,7 @@ public class Adquisicion extends javax.swing.JFrame {
         jLabel2.setText("jLabel2");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle("Sistema de Adquisición de Parámetros Scorbot");
+        setTitle("SAPBot");
         setBackground(new java.awt.Color(255, 255, 255));
         setIconImage(getIconImage());
         setResizable(false);
