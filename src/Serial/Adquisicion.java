@@ -42,7 +42,7 @@ public class Adquisicion extends javax.swing.JFrame {
         public void run() {
             in = scorbot.getInputStream(); //Obtiene canal de Entrada del Controlador Scorbot-
             in2 = arduino.getInputStream(); //Obtiene canal de Entrada del Arduino Mega.
-            jTextArea1.setText("Listo.\n\n"); 
+            consolaTXT("Listo.\n"); 
             while (true){                              
                 try 
                 {
@@ -65,7 +65,7 @@ public class Adquisicion extends javax.swing.JFrame {
                             encoAnterior=enco.clone();
                             datosArduino=capturarArduino(in2);
                             if(!escribir(encoAnterior,datosArduino))
-                                jTextArea1.setText(jTextArea1.getText()+"Error al Escribir Archivo: "+ruta+".txt/n");
+                                consolaTXT("Error al Escribir Archivo: "+ruta+".txt");
                         }
                         
                         //Si el encoder no es válido, se trata de limpiar el string
@@ -81,7 +81,7 @@ public class Adquisicion extends javax.swing.JFrame {
                                     encoAnterior=enco.clone();
                                     datosArduino=capturarArduino(in2);
                                     if(!escribir(encoAnterior,datosArduino))
-                                        jTextArea1.setText(jTextArea1.getText()+"Error al Escribir Archivo: "+ruta+".txt/n");
+                                        consolaTXT("Error al Escribir Archivo: "+ruta+".txt");
                                 }
                                 //Se elimina los números y el signo - del string y el valor resultante se envía
                                 //al terminal. Usualmente los mensajes enviados en esta etapa son respuestas de los
@@ -94,7 +94,7 @@ public class Adquisicion extends javax.swing.JFrame {
                                 if(encoAnterior != null)
                                 {
                                     if(!escribir(encoAnterior,datosArduino))
-                                        jTextArea1.setText(jTextArea1.getText()+"Error al Escribir Archivo: "+ruta+".txt/n");
+                                        consolaTXT("Error al Escribir Archivo: "+ruta+".txt");
                                 }   
                             }
                             
@@ -261,6 +261,7 @@ public class Adquisicion extends javax.swing.JFrame {
         }
     }
     
+    //Envia mensajes a consola de mensajes
     public void consolaTXT(String s)
     {
         jTextArea1.setText(jTextArea1.getText()+s+"\n");
@@ -380,7 +381,7 @@ public class Adquisicion extends javax.swing.JFrame {
                     String enviar = "show enco\r";
                     printStream.print(enviar);
                     printStream.close();
-                    jTextArea1.setText(jTextArea1.getText()+"Capturando prueba en: "+ruta+"\n");
+                    consolaTXT("Capturando prueba en: "+ruta);
                 }
                 else
                 {
@@ -401,8 +402,18 @@ public class Adquisicion extends javax.swing.JFrame {
             char enviar = (char) 3;
             printStream.print(enviar);
             printStream.close();   
-            jTextArea1.setText(jTextArea1.getText()+"Prueba Finalizada."+"\n\n");
-            exec.execute(new Subida(ruta,nombreP,this));
+            consolaTXT("Prueba Finalizada.\n");
+            File f = new File(ruta);
+            if(f.exists() && !f.isDirectory()) { 
+                exec.execute(new Subida(ruta,nombreP,this));
+            }
+            else
+            {
+                consolaTXT("No se capturaron datos.");
+                consolaTXT("Verifique que esten encendidos los dispositivos y");
+                consolaTXT("configurados de forma correcta.\n");
+            }
+            
         }
     }//GEN-LAST:event_jToggleButton1ActionPerformed
 
