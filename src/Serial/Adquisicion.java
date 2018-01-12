@@ -10,6 +10,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,15 +23,12 @@ import javax.swing.JOptionPane;
 public class Adquisicion extends javax.swing.JFrame {
 
     public SerialPort scorbot,arduino;
-    private String captura;
     private char ser;
-    private String[] enco,encoAnterior;
-    private String datosArduino;
-    private String nombreP;
+    private String[] enco, encoAnterior;
+    private String datosArduino, nombreP, captura, ruta;
     private boolean capturar;
     private Terminal t;
-    private String ruta;
-    private final ExecutorService exec;
+    private ExecutorService exec;
     
     //Hilo dedicado a la captura de datos del controlador Scorbot.
     //El hilo toma los datos enconder válidos y los guarda en un archivo .txt con el
@@ -46,18 +44,18 @@ public class Adquisicion extends javax.swing.JFrame {
             while (true){                              
                 try 
                 {
-                    //Recibe los datos por serial del controlador y los guarda
-                    //en el string captura. Los datos son guardados en captura
-                    //hasta que se reciba un retorno de carro (\r).
-                    ser = (char)in.read();
-                    while (ser != '\r')
-                    {
-                        captura=captura+ser;
-                        ser = (char)in.read();
-                    }
                     //Si se inició la prueba (capturar == true).
                     if (capturar)
                     {
+                        //Recibe los datos por serial del controlador y los guarda
+                        //en el string captura. Los datos son guardados en captura
+                        //hasta que se reciba un retorno de carro (\r).
+                        ser = (char)in.read();
+                        while (ser != '\r')
+                        {
+                            captura=captura+ser;
+                            ser = (char)in.read();
+                        }
                         //Se procesa el String para validar si es un valor de encoder válido.
                         enco=capturarEnco(captura);
                         if (esEnco(enco))
@@ -69,7 +67,7 @@ public class Adquisicion extends javax.swing.JFrame {
                         }
                         
                         //Si el encoder no es válido, se trata de limpiar el string
-                        //de cualquier carácter no valido para el encoder y se vuelve a probar.
+                        //de cualquier char no valido para el encoder y se vuelve a probar.
                         //En caso de no ser válido, se utilizan los valores previamente validados.
                         else
                         {
@@ -99,16 +97,15 @@ public class Adquisicion extends javax.swing.JFrame {
                             }
                             
                         }
+                        //Se limpia el string captura para reiniciar el proceso de captura.
+                        captura="";
                     }
                     //En caso de no estar capturando, todos los caracteres recibidos
                     //son enviados al terminal.
                     else
                     {
-                        t.recibir(captura);
+                        t.recibir((char)in.read());
                     }
-                    //Se limpia el string captura para reiniciar el proceso de captura.
-                    captura="";
-                    
                     
                } catch (IOException ex) {
                    JOptionPane.showMessageDialog(null,"Se desconectó puerto serial.","Error",JOptionPane.ERROR_MESSAGE);
@@ -193,25 +190,8 @@ public class Adquisicion extends javax.swing.JFrame {
         initComponents();
         t.addWindowListener(exitListener); //Se agrega exitListener previamente creado a la ventana Terminal
         this.getContentPane().setBackground(Color.white);
-        this.addWindowListener(cerrarSistema);
     }   
-    
-    //Se crea evento cerrarSistema para entregárselo a la ventana de Adquisición.
-                    //Remplaza la función del botón cerrar para que vuelva a activar el botón "Iniciar Terminal"
-                    WindowListener cerrarSistema = new WindowAdapter() {
-                    @Override
-                    public void windowClosing(WindowEvent e) {
-                        jButton1.setEnabled(false);
-                        jToggleButton1.setEnabled(false);
-                        consolaTXT("Cerrando Sistema...");
-                        consolaTXT("Finalizando Hilos de Subida");
-                        exec.shutdown();
-                        while (!exec.isTerminated()) {
-                        }
-                        System.exit(0);
-                    }
-                    };
-    
+      
     //Función para detectar si el texto ingresado es un dato encoder valido.
     private boolean esEnco(String[] enco)
     {
@@ -265,6 +245,7 @@ public class Adquisicion extends javax.swing.JFrame {
     public void consolaTXT(String s)
     {
         jTextArea1.setText(jTextArea1.getText()+s+"\n");
+        jTextArea1.setCaretPosition(jTextArea1.getText().length());
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -284,7 +265,7 @@ public class Adquisicion extends javax.swing.JFrame {
 
         jLabel2.setText("jLabel2");
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("SAPBot");
         setBackground(new java.awt.Color(255, 255, 255));
         setIconImage(getIconImage());
@@ -405,7 +386,11 @@ public class Adquisicion extends javax.swing.JFrame {
             consolaTXT("Prueba Finalizada.\n");
             File f = new File(ruta);
             if(f.exists() && !f.isDirectory()) { 
-                exec.execute(new Subida(ruta,nombreP,this));
+                try {
+                    exec.execute(new Subida(ruta,nombreP,this));
+                } catch (FileNotFoundException ex) {
+                    JOptionPane.showMessageDialog(null,ex.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
+                }
             }
             else
             {

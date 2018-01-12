@@ -20,6 +20,14 @@ public class Terminal extends javax.swing.JFrame {
         jTextArea1.setCaretPosition(jTextArea1.getText().length());
     }
     
+    //La función recibe un char s y agrega al jTextArea1
+    //sin perder el texto que se encuentre previamente. 
+    public void recibir(char s)
+    {
+        jTextArea1.setText(jTextArea1.getText()+s);
+        jTextArea1.setCaretPosition(jTextArea1.getText().length());
+    }
+    
     public Terminal() {
         initComponents();
         this.getContentPane().setBackground(Color.white);

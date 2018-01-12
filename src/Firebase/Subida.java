@@ -3,36 +3,46 @@ package Firebase;
 import Serial.Adquisicion;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.database.DatabaseException;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.tasks.Task;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import javax.swing.JOptionPane;
 
 public class Subida implements Runnable {
-    private String ruta, nombre;
+    private String ruta, nombre, BD_URL, CREDENCIALES;
     private Adquisicion a;
     private File f;
     private boolean inicializado;
 
-    public Subida(String s, String n, Adquisicion a) {
+    public Subida(String s, String n, Adquisicion a) throws FileNotFoundException {
         this.inicializado = false;
         ruta=s;
         nombre=n;
         this.a=a;
+        
+        //Se cargan los datos para inicializar firebase en el sistema desde el
+        //archivo config.cfg
+        File archivo = new File("config.cfg");
+        Scanner scan = new Scanner(archivo);
+        BD_URL=scan.nextLine();
+        CREDENCIALES=scan.nextLine();
+        if (BD_URL == null || CREDENCIALES == null)
+            throw new FileNotFoundException("Archivo config.cfg se encuentra incompleto./n"
+                    + "Revisar archivo config.cfg");
     }
 
     
-    public void Lectura (){
-        //Hace referencia a la base de datos y las credenciales de datos
-        String BD_URL = "https://sapbot-001.firebaseio.com/";
-        String CREDENCIALES = "Credencial SAPBot.json";
+    public void Lectura () throws DatabaseException,IllegalStateException{
         try{
              FirebaseApp.getInstance();
         }catch (IllegalStateException ex)
@@ -46,7 +56,8 @@ public class Subida implements Runnable {
                 //La siguiente linea muestra los errores por consola
                 //FirebaseDatabase.getInstance().setLogLevel(com.google.firebase.database.Logger.Level.DEBUG);
             } catch (FileNotFoundException e) {
-                JOptionPane.showMessageDialog(null, e.getMessage());
+                JOptionPane.showMessageDialog(null,"El archivo "+CREDENCIALES+" no existe.\n"
+                        + "Revisar archivo config.cfg","Error",JOptionPane.ERROR_MESSAGE);
             }
         }
         //Permite referenciar a la base de datos para poder enviar los datos
@@ -54,7 +65,6 @@ public class Subida implements Runnable {
         final DatabaseReference ref = database.getReferenceFromUrl(BD_URL);
         
         f = new File(ruta);
-        //File f = new File("C:/Users/Hugo/Desktop/SAPbot-master/prueba.txt");
         StringTokenizer tok1;
         Scanner entrada = null;
         String cadena, st1;
@@ -219,69 +229,83 @@ public class Subida implements Runnable {
             String tem5 = String.join(", ", t5);
             String tem6 = String.join(", ", t6);
             
+            List<Task> tasks = new ArrayList<Task>();
+            
             //Referencias generales de la base de datos
             Calendar c1 = GregorianCalendar.getInstance();
             String c2 = c1.getTime().toLocaleString();
-            DatabaseReference re = ref.child(nombre);//Cambiar por nombre txt despues
+            DatabaseReference re = ref.child(nombre);
             DatabaseReference re1 = re.child(c2);
             //Envio datos posicion
             DatabaseReference re2 = re1.child("Posicion");
             DatabaseReference act = re2.child("Motor 1");
-            act.setValue(enco1);
+            tasks.add(act.setValue(enco1));
             DatabaseReference act2 = re2.child("Motor 2");
-            act2.setValue(enco2);
+            tasks.add(act2.setValue(enco2));
             DatabaseReference act3 = re2.child("Motor 3");
-            act3.setValue(enco3);
+            tasks.add(act3.setValue(enco3));
             DatabaseReference act4 = re2.child("Motor 4");
-            act4.setValue(enco4);
+            tasks.add(act4.setValue(enco4));
             DatabaseReference act5 = re2.child("Motor 5");
-            act5.setValue(enco5);
+            tasks.add(act5.setValue(enco5));
             DatabaseReference act6 = re2.child("Motor 6");
-            act6.setValue(enco6);
+            tasks.add(act6.setValue(enco6));
             //Envio datos Voltaje
             DatabaseReference re3 = re1.child("Voltaje");
             DatabaseReference act7 = re3.child("Motor 1");
-            act7.setValue(vol1);
+            tasks.add(act7.setValue(vol1));
             DatabaseReference act8 = re3.child("Motor 2");
-            act8.setValue(vol2);
+            tasks.add(act8.setValue(vol2));
             DatabaseReference act9 = re3.child("Motor 3");
-            act9.setValue(vol3);
+            tasks.add(act9.setValue(vol3));
             DatabaseReference act10 = re3.child("Motor 4");
-            act10.setValue(vol4);
+            tasks.add(act10.setValue(vol4));
             DatabaseReference act11 = re3.child("Motor 5");
-            act11.setValue(vol5);
+            tasks.add(act11.setValue(vol5));
             DatabaseReference act12 = re3.child("Motor 6");
-            act12.setValue(vol6);
+            tasks.add(act12.setValue(vol6));
             //Envio datos frecuencia
             DatabaseReference re4 = re1.child("Frecuencia");
             DatabaseReference act13 = re4.child("Motor 1");
-            act13.setValue(fre1);
+            tasks.add(act13.setValue(fre1));
             DatabaseReference act14 = re4.child("Motor 2");
-            act14.setValue(fre2);
+            tasks.add(act14.setValue(fre2));
             DatabaseReference act15 = re4.child("Motor 3");
-            act15.setValue(fre3);
+            tasks.add(act15.setValue(fre3));
             DatabaseReference act16 = re4.child("Motor 4");
-            act16.setValue(fre4);
+            tasks.add(act16.setValue(fre4));
             DatabaseReference act17 = re4.child("Motor 5");
-            act17.setValue(fre5);
+            tasks.add(act17.setValue(fre5));
             DatabaseReference act18 = re4.child("Motor 6");
-            act18.setValue(fre6);
+            tasks.add(act18.setValue(fre6));
             //Envio datos temperatura
             DatabaseReference re5 = re1.child("Temperatura");
             DatabaseReference act19 = re5.child("Motor 1");
-            act19.setValue(tem1);
+            tasks.add(act19.setValue(tem1));
             DatabaseReference act20 = re5.child("Motor 2");
-            act20.setValue(tem2);
+            tasks.add(act20.setValue(tem2));
             DatabaseReference act21 = re5.child("Motor 3");
-            act21.setValue(tem3);
+            tasks.add(act21.setValue(tem3));
             DatabaseReference act22 = re5.child("Motor 4");
-            act22.setValue(tem4);
+            tasks.add(act22.setValue(tem4));
             DatabaseReference act23 = re5.child("Motor 5");
-            act23.setValue(tem5);
+            tasks.add(act23.setValue(tem5));
             DatabaseReference act24 = re5.child("Motor 6");
-            act24.setValue(tem6);
+            tasks.add(act24.setValue(tem6));
+            a.consolaTXT("Subiendo prueba "+nombre+" a Firebase...");
+            //Se verifican que todos los datos se han subido a la nube.
+            for(int i=0;i<tasks.size();i++)
+            {
+                while(!tasks.get(i).isComplete())
+                {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException ex) {
+                        System.out.println(ex.getMessage());
+                    }
+                }
+            }
             a.consolaTXT("La prueba "+nombre+" se ha subido a exitosamente a Firebase.");
-            
         } catch (FileNotFoundException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
             } 
@@ -297,7 +321,14 @@ public class Subida implements Runnable {
     public void run() {
         //throw new UnsupportedOperationException("Not supported yet.");
         //To change body of generated methods, choose Tools | Templates.
+        try
+        {
         Lectura();
+        }catch(DatabaseException ex){
+            JOptionPane.showMessageDialog(null,"URL a Firebase invalida\n"
+                    + "Revisar archivo config.cfg","Error",JOptionPane.ERROR_MESSAGE);
+        }catch(IllegalStateException e){
+            
+        }
     }
-    
 }
