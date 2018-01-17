@@ -23,10 +23,11 @@ import javax.swing.JOptionPane;
 public class Adquisicion extends javax.swing.JFrame {
 
     public SerialPort scorbot,arduino;
+    public boolean slidebase;
     private char ser;
     private String[] enco, encoAnterior;
     private String datosArduino, nombreP, captura, ruta;
-    private boolean capturar, slidebase;
+    private boolean capturar;
     private Terminal t;
     private ExecutorService exec;
     

@@ -75,25 +75,29 @@ public class Subida implements Runnable {
         ArrayList<String> e3 = new ArrayList<String>();
         ArrayList<String> e4 = new ArrayList<String>();
         ArrayList<String> e5 = new ArrayList<String>();
-        ArrayList<String> e6 = new ArrayList<String>();        
+        ArrayList<String> e6 = new ArrayList<String>(); 
+        ArrayList<String> e7 = new ArrayList<String>();
         ArrayList<String> v1 = new ArrayList<String>();
         ArrayList<String> v2 = new ArrayList<String>();
         ArrayList<String> v3 = new ArrayList<String>();        
         ArrayList<String> v4 = new ArrayList<String>();
         ArrayList<String> v5 = new ArrayList<String>();
         ArrayList<String> v6 = new ArrayList<String>();
+        ArrayList<String> v7 = new ArrayList<String>();
         ArrayList<String> f1 = new ArrayList<String>();
         ArrayList<String> f2 = new ArrayList<String>();
         ArrayList<String> f3 = new ArrayList<String>();
         ArrayList<String> f4 = new ArrayList<String>();
         ArrayList<String> f5 = new ArrayList<String>();
-        ArrayList<String> f6 = new ArrayList<String>();        
+        ArrayList<String> f6 = new ArrayList<String>();
+        ArrayList<String> f7 = new ArrayList<String>();
         ArrayList<String> t1 = new ArrayList<String>();
         ArrayList<String> t2 = new ArrayList<String>();
         ArrayList<String> t3 = new ArrayList<String>();        
         ArrayList<String> t4 = new ArrayList<String>();
         ArrayList<String> t5 = new ArrayList<String>();
         ArrayList<String> t6 = new ArrayList<String>();
+        ArrayList<String> t7 = new ArrayList<String>();
         try {
             entrada = new Scanner(f);
             while (entrada.hasNext()) {
@@ -128,6 +132,10 @@ public class Subida implements Runnable {
                            //encoder motor 6
                            e6.add(tok3[j-1]);
                        }
+                       if (i==0 && j==7){
+                           //encoder motor 7
+                           e7.add(tok3[j-1]);
+                       }
                        if (i==1 && j==1){
                            //voltaje motor 1
                            v1.add(tok3[j-1]);
@@ -151,6 +159,10 @@ public class Subida implements Runnable {
                        if (i==1 && j==6){
                            //voltaje motor 6
                            v6.add(tok3[j-1]);
+                       }
+                       if (i==1 && j==7){
+                           //voltaje motor 7
+                           v7.add(tok3[j-1]);
                        }
                        if (i==2 && j==1){
                            //frecuencia motor 1
@@ -176,6 +188,10 @@ public class Subida implements Runnable {
                            //frecuencia motor 6
                            f6.add(tok3[j-1]);
                        }
+                       if (i==2 && j==7){
+                           //frecuencia motor 7
+                           f7.add(tok3[j-1]);
+                       }
                        if (i==3 && j==1){
                            //temperatura motor 1
                            t1.add(tok3[j-1]);
@@ -199,6 +215,10 @@ public class Subida implements Runnable {
                        if (i==3 && j==6){
                            //temperatura motor 6
                            t6.add(tok3[j-1]);
+                       }
+                       if (i==3 && j==7){
+                           //temperatura motor 7
+                           t7.add(tok3[j-1]);
                        }
                    }
                 }
@@ -228,6 +248,14 @@ public class Subida implements Runnable {
             String tem4 = String.join(", ", t4);
             String tem5 = String.join(", ", t5);
             String tem6 = String.join(", ", t6);
+            String enco7="", vol7="", fre7="", tem7="";
+            
+            if (a.slidebase){
+                enco7 = String.join(", ", e7);
+                vol7 = String.join(", ", v7);
+                fre7 = String.join(", ", f7);
+                tem7 = String.join(", ", t7);
+            }
             
             List<Task> tasks = new ArrayList<Task>();
             
@@ -236,62 +264,78 @@ public class Subida implements Runnable {
             String c2 = c1.getTime().toLocaleString();
             DatabaseReference re = ref.child(nombre);
             DatabaseReference re1 = re.child(c2);
-            //Envio datos posicion
-            DatabaseReference re2 = re1.child("Posicion");
-            DatabaseReference act = re2.child("Motor 1");
+            //Envio datos Motor 1
+            DatabaseReference re2 = re1.child("Motor 1");
+            DatabaseReference act = re2.child("Posicion");
             tasks.add(act.setValue(enco1));
-            DatabaseReference act2 = re2.child("Motor 2");
-            tasks.add(act2.setValue(enco2));
-            DatabaseReference act3 = re2.child("Motor 3");
-            tasks.add(act3.setValue(enco3));
-            DatabaseReference act4 = re2.child("Motor 4");
-            tasks.add(act4.setValue(enco4));
-            DatabaseReference act5 = re2.child("Motor 5");
-            tasks.add(act5.setValue(enco5));
-            DatabaseReference act6 = re2.child("Motor 6");
-            tasks.add(act6.setValue(enco6));
-            //Envio datos Voltaje
-            DatabaseReference re3 = re1.child("Voltaje");
-            DatabaseReference act7 = re3.child("Motor 1");
+            DatabaseReference act7 = re2.child("Voltaje");
             tasks.add(act7.setValue(vol1));
-            DatabaseReference act8 = re3.child("Motor 2");
-            tasks.add(act8.setValue(vol2));
-            DatabaseReference act9 = re3.child("Motor 3");
-            tasks.add(act9.setValue(vol3));
-            DatabaseReference act10 = re3.child("Motor 4");
-            tasks.add(act10.setValue(vol4));
-            DatabaseReference act11 = re3.child("Motor 5");
-            tasks.add(act11.setValue(vol5));
-            DatabaseReference act12 = re3.child("Motor 6");
-            tasks.add(act12.setValue(vol6));
-            //Envio datos frecuencia
-            DatabaseReference re4 = re1.child("Frecuencia");
-            DatabaseReference act13 = re4.child("Motor 1");
+            DatabaseReference act13 = re2.child("Frecuencia");
             tasks.add(act13.setValue(fre1));
-            DatabaseReference act14 = re4.child("Motor 2");
-            tasks.add(act14.setValue(fre2));
-            DatabaseReference act15 = re4.child("Motor 3");
-            tasks.add(act15.setValue(fre3));
-            DatabaseReference act16 = re4.child("Motor 4");
-            tasks.add(act16.setValue(fre4));
-            DatabaseReference act17 = re4.child("Motor 5");
-            tasks.add(act17.setValue(fre5));
-            DatabaseReference act18 = re4.child("Motor 6");
-            tasks.add(act18.setValue(fre6));
-            //Envio datos temperatura
-            DatabaseReference re5 = re1.child("Temperatura");
-            DatabaseReference act19 = re5.child("Motor 1");
+            DatabaseReference act19 = re2.child("Temperatura");
             tasks.add(act19.setValue(tem1));
-            DatabaseReference act20 = re5.child("Motor 2");
+            //Envio datos Motor 2
+            DatabaseReference re3 = re1.child("Motor 2");
+            DatabaseReference act2 = re3.child("Posicion");
+            tasks.add(act2.setValue(enco2));
+            DatabaseReference act8 = re3.child("Voltaje");
+            tasks.add(act8.setValue(vol2));
+            DatabaseReference act14 = re3.child("Frecuencia");
+            tasks.add(act14.setValue(fre2));
+            DatabaseReference act20 = re3.child("Temperatura");
             tasks.add(act20.setValue(tem2));
-            DatabaseReference act21 = re5.child("Motor 3");
+            //Envio datos Motor 3
+            DatabaseReference re4 = re1.child("Motor 3");
+            DatabaseReference act3 = re4.child("Posicion");
+            tasks.add(act3.setValue(enco3));
+            DatabaseReference act9 = re4.child("Voltaje");
+            tasks.add(act9.setValue(vol3));
+            DatabaseReference act15 = re4.child("Frecuencia");
+            tasks.add(act15.setValue(fre3));
+            DatabaseReference act21 = re4.child("Temperatura");
             tasks.add(act21.setValue(tem3));
-            DatabaseReference act22 = re5.child("Motor 4");
+            //Envio datos Motor 4
+            DatabaseReference re5 = re1.child("Motor 4");
+            DatabaseReference act4 = re5.child("Posicion");
+            tasks.add(act4.setValue(enco4));
+            DatabaseReference act10 = re5.child("Voltaje");
+            tasks.add(act10.setValue(vol4));
+            DatabaseReference act16 = re5.child("Frecuencia");
+            tasks.add(act16.setValue(fre4));
+            DatabaseReference act22 = re5.child("Temperatura");
             tasks.add(act22.setValue(tem4));
-            DatabaseReference act23 = re5.child("Motor 5");
+            //Envio datos Motor 5
+            DatabaseReference re6 = re1.child("Motor 5");
+            DatabaseReference act5 = re6.child("Posicion");
+            tasks.add(act5.setValue(enco5));
+            DatabaseReference act11 = re6.child("Voltaje");
+            tasks.add(act11.setValue(vol5));
+            DatabaseReference act17 = re6.child("Frecuencia");
+            tasks.add(act17.setValue(fre5));
+            DatabaseReference act23 = re6.child("Temperatura");
             tasks.add(act23.setValue(tem5));
-            DatabaseReference act24 = re5.child("Motor 6");
+            //Envio datos Motor 6
+            DatabaseReference re7 = re1.child("Motor 6");
+            DatabaseReference act6 = re7.child("Posicion");
+            tasks.add(act6.setValue(enco6));
+            DatabaseReference act12 = re7.child("Voltaje");
+            tasks.add(act12.setValue(vol6));
+            DatabaseReference act18 = re7.child("Frecuencia");
+            tasks.add(act18.setValue(fre6));
+            DatabaseReference act24 = re7.child("Temperatura");
             tasks.add(act24.setValue(tem6));
+            //Envio datos Motor 7 (si corresponde)
+            if (a.slidebase){
+            DatabaseReference re8 = re1.child("Motor 7");
+            DatabaseReference act25 = re8.child("Posicion");
+            tasks.add(act25.setValue(enco7));
+            DatabaseReference act26 = re8.child("Voltaje");
+            tasks.add(act26.setValue(vol7));
+            DatabaseReference act27 = re8.child("Frecuencia");
+            tasks.add(act27.setValue(fre7));
+            DatabaseReference act28 = re8.child("Temperatura");
+            tasks.add(act28.setValue(tem7));  
+            }
             a.consolaTXT("Subiendo prueba "+nombre+" a Firebase...");
             //Se verifican que todos los datos se han subido a la nube.
             for(int i=0;i<tasks.size();i++)
