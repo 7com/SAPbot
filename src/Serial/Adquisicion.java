@@ -26,7 +26,7 @@ public class Adquisicion extends javax.swing.JFrame {
     private char ser;
     private String[] enco, encoAnterior;
     private String datosArduino, nombreP, captura, ruta;
-    private boolean capturar;
+    private boolean capturar, slidebase;
     private Terminal t;
     private ExecutorService exec;
     
@@ -123,12 +123,25 @@ public class Adquisicion extends javax.swing.JFrame {
             File archivo = new File(ruta);
             BufferedWriter bw;
             String s="";
-            for (int i=0;i<6;i++)
+            if (!slidebase)
             {
-                if(i==5)
-                    s=s+e[i]+";";
-                else
-                    s=s+e[i]+",";
+                for (int i=0;i<6;i++)
+                {
+                    if(i==5)
+                        s=s+e[i]+";";
+                    else
+                        s=s+e[i]+",";
+                }
+            }
+            else
+            {
+                for (int i=0;i<7;i++)
+                {
+                    if(i==6)
+                        s=s+e[i]+";";
+                    else
+                        s=s+e[i]+",";
+                }
             }
             s=s+a;
             if(archivo.exists()) {
@@ -151,7 +164,10 @@ public class Adquisicion extends javax.swing.JFrame {
         String str="";
         OutputStream out = arduino.getOutputStream();
         PrintStream printStream = new PrintStream(out);
-        printStream.print("\n");   
+        if (!slidebase)
+            printStream.print("0");
+        else
+            printStream.print("1");
         char c = (char)in.read();
         while (c != '\r')
         {
@@ -181,7 +197,7 @@ public class Adquisicion extends javax.swing.JFrame {
     }
     };
     
-    public Adquisicion() {
+    public Adquisicion(boolean b) {
         this.captura = "";
         this.capturar = false;
         this.t = new Terminal();
@@ -190,25 +206,46 @@ public class Adquisicion extends javax.swing.JFrame {
         initComponents();
         t.addWindowListener(exitListener); //Se agrega exitListener previamente creado a la ventana Terminal
         this.getContentPane().setBackground(Color.white);
+        slidebase=b;
     }   
       
     //Función para detectar si el texto ingresado es un dato encoder valido.
     private boolean esEnco(String[] enco)
     {
-        if (enco.length != 6)
+        if (!slidebase)
         {
-            return false;
+            if (enco.length != 6)
+            {
+                return false;
+            }
+            else
+            {
+                for (int i=0; i<6;i++){
+                    if (!esNumeroEnco(enco[i]))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
         else
         {
-            for (int i=0; i<6;i++){
-                if (!esNumeroEnco(enco[i]))
-                {
-                    return false;
+             if (enco.length != 8)
+            {
+                return false;
+            }
+            else
+            {
+                for (int i=0; i<7;i++){
+                    if (!esNumeroEnco(enco[i]))
+                    {
+                        return false;
+                    }
                 }
             }
+            return true;
         }
-        return true;
     }
     
     //Verifica si el número recibido es un número encoder valido
