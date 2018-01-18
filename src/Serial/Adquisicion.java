@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.swing.JOptionPane;
@@ -26,7 +28,7 @@ public class Adquisicion extends javax.swing.JFrame {
     public boolean slidebase;
     private char ser;
     private String[] enco, encoAnterior;
-    private String datosArduino, nombreP, captura, ruta;
+    private String datosArduino, nombreP, captura, ruta, fecha;
     private boolean capturar;
     private Terminal t;
     private ExecutorService exec;
@@ -393,6 +395,8 @@ public class Adquisicion extends javax.swing.JFrame {
                 if (!ruta.equals(".txt"))
                 {
                     capturar=true;
+                    Calendar c1 = GregorianCalendar.getInstance();
+                    fecha = c1.getTime().toLocaleString();
                     jToggleButton1.setSelected(true);
                     jToggleButton1.setText("Finalizar Captura");
                     OutputStream out = scorbot.getOutputStream();
@@ -425,7 +429,7 @@ public class Adquisicion extends javax.swing.JFrame {
             File f = new File(ruta);
             if(f.exists() && !f.isDirectory()) { 
                 try {
-                    exec.execute(new Subida(ruta,nombreP,this));
+                    exec.execute(new Subida(ruta,nombreP,this,fecha));
                 } catch (FileNotFoundException ex) {
                     JOptionPane.showMessageDialog(null,ex.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
                 }

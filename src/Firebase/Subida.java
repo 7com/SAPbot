@@ -19,16 +19,17 @@ import java.util.StringTokenizer;
 import javax.swing.JOptionPane;
 
 public class Subida implements Runnable {
-    private String ruta, nombre, BD_URL, CREDENCIALES;
+    private String ruta, nombre, BD_URL, CREDENCIALES, fecha;
     private Adquisicion a;
     private File f;
     private boolean inicializado;
 
-    public Subida(String s, String n, Adquisicion a) throws FileNotFoundException {
+    public Subida(String s, String n, Adquisicion a, String f) throws FileNotFoundException {
         this.inicializado = false;
         ruta=s;
         nombre=n;
         this.a=a;
+        f=fecha;
         
         //Se cargan los datos para inicializar firebase en el sistema desde el
         //archivo config.cfg
@@ -263,7 +264,7 @@ public class Subida implements Runnable {
             Calendar c1 = GregorianCalendar.getInstance();
             String c2 = c1.getTime().toLocaleString();
             DatabaseReference re = ref.child(nombre);
-            DatabaseReference re1 = re.child(c2);
+            DatabaseReference re1 = re.child(fecha+" - "+c2);
             //Envio datos Motor 1
             DatabaseReference re2 = re1.child("Motor 1");
             DatabaseReference act = re2.child("Posicion");
