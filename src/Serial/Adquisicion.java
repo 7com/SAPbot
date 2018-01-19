@@ -28,7 +28,8 @@ public class Adquisicion extends javax.swing.JFrame {
     public boolean slidebase;
     private char ser;
     private String[] enco, encoAnterior;
-    private String datosArduino, nombreP, captura, ruta, fecha;
+    private String datosArduino, nombreP, captura, ruta;
+    public String fecha;
     private boolean capturar;
     private Terminal t;
     private ExecutorService exec;
@@ -429,7 +430,7 @@ public class Adquisicion extends javax.swing.JFrame {
             File f = new File(ruta);
             if(f.exists() && !f.isDirectory()) { 
                 try {
-                    exec.execute(new Subida(ruta,nombreP,this,fecha));
+                    exec.execute(new Subida(ruta,nombreP,this));
                 } catch (FileNotFoundException ex) {
                     JOptionPane.showMessageDialog(null,ex.getMessage(),"Error",JOptionPane.ERROR_MESSAGE);
                 }
