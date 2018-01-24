@@ -24,11 +24,11 @@ import javax.swing.JOptionPane;
 
 public class Adquisicion extends javax.swing.JFrame {
 
-    public SerialPort scorbot,arduino;
+    public SerialPort scorbot,arduino,adam;
     public boolean slidebase;
     private char ser;
     private String[] enco, encoAnterior;
-    private String datosArduino, nombreP, captura, ruta;
+    private String datosArduino, nombreP, captura, ruta, datosAdam;
     public String fecha;
     private boolean capturar;
     private Terminal t;
@@ -39,11 +39,12 @@ public class Adquisicion extends javax.swing.JFrame {
     //nombre de la prueba previamente indicado por el usuario.
     //Los datos que no sean parte de los encoder son enviados a la terminal del sistema.
     Thread lectura = new Thread() {
-        InputStream in,in2;
+        private InputStream in,in2,in3;
         @Override
         public void run() {
             in = scorbot.getInputStream(); //Obtiene canal de Entrada del Controlador Scorbot-
             in2 = arduino.getInputStream(); //Obtiene canal de Entrada del Arduino Mega.
+            in3 = adam.getInputStream(); //Obtiene canal de Entrada del ADAM 4017.
             consolaTXT("Listo.\n"); 
             while (true){                              
                 try 
@@ -66,7 +67,8 @@ public class Adquisicion extends javax.swing.JFrame {
                         {
                             encoAnterior=enco.clone();
                             datosArduino=capturarArduino(in2);
-                            if(!escribir(encoAnterior,datosArduino))
+                            datosAdam=capturarAdam(in3);
+                            if(!escribir(encoAnterior,datosArduino,datosAdam))
                                 consolaTXT("Error al Escribir Archivo: "+ruta+".txt");
                         }
                         
@@ -82,7 +84,8 @@ public class Adquisicion extends javax.swing.JFrame {
                                 {
                                     encoAnterior=enco.clone();
                                     datosArduino=capturarArduino(in2);
-                                    if(!escribir(encoAnterior,datosArduino))
+                                    datosAdam=capturarAdam(in3);
+                                    if(!escribir(encoAnterior,datosArduino,datosAdam))
                                         consolaTXT("Error al Escribir Archivo: "+ruta+".txt");
                                 }
                                 //Se elimina los números y el signo - del string y el valor resultante se envía
@@ -95,7 +98,7 @@ public class Adquisicion extends javax.swing.JFrame {
                             {
                                 if(encoAnterior != null)
                                 {
-                                    if(!escribir(encoAnterior,datosArduino))
+                                    if(!escribir(encoAnterior,datosArduino,datosAdam))
                                         consolaTXT("Error al Escribir Archivo: "+ruta+".txt");
                                 }   
                             }
@@ -120,7 +123,7 @@ public class Adquisicion extends javax.swing.JFrame {
     };
 
     //Función dedicada a crear el archivo de texto que contiene los datos de la prueba.
-    private boolean escribir(String[] e,String a)
+    private boolean escribir(String[] e,String a, String ad)
     {
         try
         {
@@ -147,7 +150,7 @@ public class Adquisicion extends javax.swing.JFrame {
                         s=s+e[i]+",";
                 }
             }
-            s=s+a;
+            s=s+ad+a;
             if(archivo.exists()) {
                 bw = new BufferedWriter(new FileWriter(archivo, true));
                 bw.write("\n"+s);
@@ -177,6 +180,48 @@ public class Adquisicion extends javax.swing.JFrame {
         {
             str=str+c;
             c = (char)in.read();
+        }
+        printStream.close();
+        return str;
+    }
+    
+    private String capturarAdam(InputStream in) throws IOException{
+        String str="";
+        OutputStream out = adam.getOutputStream();
+        PrintStream printStream = new PrintStream(out);
+        if (!slidebase) 
+        {
+            for (int i=0;i<6;i++)
+            {
+                printStream.print("#02"+i);
+                char c = (char)in.read();
+                while (c != '\r')
+                {
+                    str=str+c;
+                    c = (char)in.read();
+                }
+                if(i!=5)
+                    str=str+",";
+                else
+                    str=str+";";
+            }
+        }
+        else
+        {
+            for (int i=0;i<7;i++)
+            {
+                printStream.print("#02"+i);
+                char c = (char)in.read();
+                while (c != '\r')
+                {
+                    str=str+c;
+                    c = (char)in.read();
+                }
+                if(i!=6)
+                    str=str+",";
+                else
+                    str=str+";";
+            }
         }
         printStream.close();
         return str;

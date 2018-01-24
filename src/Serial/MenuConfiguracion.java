@@ -36,8 +36,8 @@ public class MenuConfiguracion extends javax.swing.JFrame {
         }
         else 
         {
-            if (comPort.length < 2){
-                JOptionPane.showMessageDialog(this,"El sistema requiere al menos 2 puertos seriales para funcionar.","Error",JOptionPane.ERROR_MESSAGE);
+            if (comPort.length < 3){
+                JOptionPane.showMessageDialog(this,"El sistema requiere al menos 3 puertos seriales para funcionar.","Error",JOptionPane.ERROR_MESSAGE);
                 jButton1.setEnabled(false);
             }
         }
@@ -45,10 +45,41 @@ public class MenuConfiguracion extends javax.swing.JFrame {
         {
             jComboBox1.addItem(new ComboItem(comPort[i].getDescriptivePortName(),comPort[i]));
             jComboBox2.addItem(new ComboItem(comPort[i].getDescriptivePortName(),comPort[i]));
+            jComboBox3.addItem(new ComboItem(comPort[i].getDescriptivePortName(),comPort[i]));
             jButton1.setEnabled(true);
         }
     }
     
+    private boolean comprobarPuertos(){
+        ComboItem i = (ComboItem)jComboBox1.getSelectedItem();
+        ComboItem j = (ComboItem)jComboBox2.getSelectedItem();
+        ComboItem k = (ComboItem)jComboBox3.getSelectedItem();
+        if (i.getPuerto() != j.getPuerto()){
+            JOptionPane.showMessageDialog(this,"El puerto del Controlador no puede ser igual al del Arduino.","Error",JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if (j.getPuerto() != k.getPuerto()){
+            JOptionPane.showMessageDialog(this,"El puerto del Controlador no puede ser igual al del ADAM.","Error",JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if (k.getPuerto() != k.getPuerto()){
+            JOptionPane.showMessageDialog(this,"El puerto del Arduino no puede ser igual al del ADAM.","Error",JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if(!i.getPuerto().openPort()){
+            JOptionPane.showMessageDialog(this,"El puerto "+i.getKey()+" se encuentra en uso.","Error",JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if(!j.getPuerto().openPort()){
+            JOptionPane.showMessageDialog(this,"El puerto "+j.getKey()+" se encuentra en uso.","Error",JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if(!k.getPuerto().openPort()){
+            JOptionPane.showMessageDialog(this,"El puerto "+k.getKey()+" se encuentra en uso.","Error",JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        return true;
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -68,6 +99,8 @@ public class MenuConfiguracion extends javax.swing.JFrame {
         jButton3 = new javax.swing.JButton();
         jCheckBox1 = new javax.swing.JCheckBox();
         jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jComboBox3 = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("SAPBot");
@@ -89,6 +122,11 @@ public class MenuConfiguracion extends javax.swing.JFrame {
         jLabel1.setText("Puerto Controlador:");
 
         jComboBox2.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jComboBox2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox2ActionPerformed(evt);
+            }
+        });
 
         jLabel2.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel2.setText("Puerto Arduino Mega:");
@@ -118,37 +156,43 @@ public class MenuConfiguracion extends javax.swing.JFrame {
         jLabel3.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
         jLabel3.setText("Slidebase:");
 
+        jLabel4.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel4.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabel4.setText("Puerto ADAM 4017:");
+
+        jComboBox3.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jButton1)
-                        .addGap(160, 160, 160))
-                    .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addComponent(jButton2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton3))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel5)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jButton2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButton3))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel1)
-                                    .addComponent(jLabel2)
-                                    .addComponent(jLabel3))
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jComboBox2, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jCheckBox1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                        .addContainerGap())))
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel3))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jCheckBox1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jComboBox2, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jComboBox3, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton1)
+                .addGap(167, 167, 167))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -165,15 +209,19 @@ public class MenuConfiguracion extends javax.swing.JFrame {
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jCheckBox1)
                     .addComponent(jLabel3))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 6, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton2)
                     .addComponent(jButton3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1)
-                .addContainerGap())
+                .addGap(15, 15, 15))
         );
 
         pack();
@@ -187,29 +235,17 @@ public class MenuConfiguracion extends javax.swing.JFrame {
         // TODO add your handling code here:
         ComboItem i = (ComboItem)jComboBox1.getSelectedItem();
         ComboItem j = (ComboItem)jComboBox2.getSelectedItem();
+        ComboItem k = (ComboItem)jComboBox3.getSelectedItem();
         
-        if (i.getPuerto() != j.getPuerto())
+        if(comprobarPuertos())
         {
-            if (i.getPuerto().openPort())
-            {
-                if(j.getPuerto().openPort())
-                {
-                    Adquisicion a = new Adquisicion(jCheckBox1.isSelected());
-                    a.scorbot = i.getPuerto();
-                    a.lectura.start();
-                    a.arduino = j.getPuerto();
-                    this.setVisible(false);
-                    a.setVisible(true);
-                }
-                else
-                    JOptionPane.showMessageDialog(this,"Error:\nEl puerto "+j.getKey()+" se encuentra en uso.","Error",JOptionPane.ERROR_MESSAGE);
-            }
-            else
-                JOptionPane.showMessageDialog(this,"Error:\nEl puerto "+i.getKey()+" se encuentra en uso.","Error",JOptionPane.ERROR_MESSAGE);
-        }
-        else
-        {
-            JOptionPane.showMessageDialog(this,"Error:\nLos puertos para Scorbot y Arduino no pueden ser iguales.","Error",JOptionPane.ERROR_MESSAGE);
+            Adquisicion a = new Adquisicion(jCheckBox1.isSelected());
+            a.scorbot = i.getPuerto();
+            a.adam = k.getPuerto();
+            a.lectura.start();
+            a.arduino = j.getPuerto();
+            this.setVisible(false);
+            a.setVisible(true);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -219,6 +255,7 @@ public class MenuConfiguracion extends javax.swing.JFrame {
         comPort = SerialPort.getCommPorts();
         jComboBox1.removeAllItems();
         jComboBox2.removeAllItems();
+        jComboBox3.removeAllItems();
         cargarPuertos();
     }//GEN-LAST:event_jButton2ActionPerformed
 
@@ -231,6 +268,10 @@ public class MenuConfiguracion extends javax.swing.JFrame {
                 + "Para mayores consultas, revisar manual de usuario ubicado en la carpeta del sistema.","Ayuda",JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_jButton3ActionPerformed
 
+    private void jComboBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jComboBox2ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
@@ -238,9 +279,11 @@ public class MenuConfiguracion extends javax.swing.JFrame {
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JComboBox<ComboItem> jComboBox1;
     private javax.swing.JComboBox<ComboItem> jComboBox2;
+    private javax.swing.JComboBox<ComboItem> jComboBox3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     // End of variables declaration//GEN-END:variables
 }

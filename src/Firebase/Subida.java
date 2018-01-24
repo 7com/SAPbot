@@ -84,13 +84,6 @@ public class Subida implements Runnable {
         ArrayList<String> v5 = new ArrayList<String>();
         ArrayList<String> v6 = new ArrayList<String>();
         ArrayList<String> v7 = new ArrayList<String>();
-        ArrayList<String> f1 = new ArrayList<String>();
-        ArrayList<String> f2 = new ArrayList<String>();
-        ArrayList<String> f3 = new ArrayList<String>();
-        ArrayList<String> f4 = new ArrayList<String>();
-        ArrayList<String> f5 = new ArrayList<String>();
-        ArrayList<String> f6 = new ArrayList<String>();
-        ArrayList<String> f7 = new ArrayList<String>();
         ArrayList<String> t1 = new ArrayList<String>();
         ArrayList<String> t2 = new ArrayList<String>();
         ArrayList<String> t3 = new ArrayList<String>();        
@@ -166,58 +159,30 @@ public class Subida implements Runnable {
                        }
                        if (i==2 && j==1){
                            //frecuencia motor 1
-                           f1.add(tok3[j-1]);
+                           t1.add(tok3[j-1]);
                        }
                        if (i==2 && j==2){
                            //frecuencia motor 2
-                           f2.add(tok3[j-1]);
+                           t2.add(tok3[j-1]);
                        }
                        if (i==2 && j==3){
                            //frecuencia motor 3
-                           f3.add(tok3[j-1]);
+                           t3.add(tok3[j-1]);
                        }
                        if (i==2 && j==4){
                            //frecuencia motor 4
-                           f4.add(tok3[j-1]);
+                           t4.add(tok3[j-1]);
                        }
                        if (i==2 && j==5){
                            //frecuencia motor 5
-                           f5.add(tok3[j-1]);
+                           t5.add(tok3[j-1]);
                        }
                        if (i==2 && j==6){
                            //frecuencia motor 6
-                           f6.add(tok3[j-1]);
+                           t6.add(tok3[j-1]);
                        }
                        if (i==2 && j==7){
                            //frecuencia motor 7
-                           f7.add(tok3[j-1]);
-                       }
-                       if (i==3 && j==1){
-                           //temperatura motor 1
-                           t1.add(tok3[j-1]);
-                       }
-                       if (i==3 && j==2){
-                           //temperatura motor 2
-                           t2.add(tok3[j-1]);
-                       }
-                       if (i==3 && j==3){
-                           //temperatura motor 3
-                           t3.add(tok3[j-1]);
-                       }
-                       if (i==3 && j==4){
-                           //temperatura motor 4
-                           t4.add(tok3[j-1]);
-                       }
-                       if (i==3 && j==5){
-                           //temperatura motor 5
-                           t5.add(tok3[j-1]);
-                       }
-                       if (i==3 && j==6){
-                           //temperatura motor 6
-                           t6.add(tok3[j-1]);
-                       }
-                       if (i==3 && j==7){
-                           //temperatura motor 7
                            t7.add(tok3[j-1]);
                        }
                    }
@@ -236,24 +201,17 @@ public class Subida implements Runnable {
             String vol4 = String.join(", ", v4);
             String vol5 = String.join(", ", v5);
             String vol6 = String.join(", ", v6);
-            String fre1 = String.join(", ", f1);
-            String fre2 = String.join(", ", f2);
-            String fre3 = String.join(", ", f3);
-            String fre4 = String.join(", ", f4);
-            String fre5 = String.join(", ", f5);
-            String fre6 = String.join(", ", f6);
             String tem1 = String.join(", ", t1);
             String tem2 = String.join(", ", t2);
             String tem3 = String.join(", ", t3);
             String tem4 = String.join(", ", t4);
             String tem5 = String.join(", ", t5);
             String tem6 = String.join(", ", t6);
-            String enco7="", vol7="", fre7="", tem7="";
+            String enco7="", vol7="", tem7="";
             
             if (a.slidebase){
                 enco7 = String.join(", ", e7);
                 vol7 = String.join(", ", v7);
-                fre7 = String.join(", ", f7);
                 tem7 = String.join(", ", t7);
             }
             
@@ -270,8 +228,6 @@ public class Subida implements Runnable {
             tasks.add(act.setValue(enco1));
             DatabaseReference act7 = re2.child("Voltaje");
             tasks.add(act7.setValue(vol1));
-            DatabaseReference act13 = re2.child("Frecuencia");
-            tasks.add(act13.setValue(fre1));
             DatabaseReference act19 = re2.child("Temperatura");
             tasks.add(act19.setValue(tem1));
             //Envio datos Motor 2
@@ -280,8 +236,6 @@ public class Subida implements Runnable {
             tasks.add(act2.setValue(enco2));
             DatabaseReference act8 = re3.child("Voltaje");
             tasks.add(act8.setValue(vol2));
-            DatabaseReference act14 = re3.child("Frecuencia");
-            tasks.add(act14.setValue(fre2));
             DatabaseReference act20 = re3.child("Temperatura");
             tasks.add(act20.setValue(tem2));
             //Envio datos Motor 3
@@ -290,8 +244,6 @@ public class Subida implements Runnable {
             tasks.add(act3.setValue(enco3));
             DatabaseReference act9 = re4.child("Voltaje");
             tasks.add(act9.setValue(vol3));
-            DatabaseReference act15 = re4.child("Frecuencia");
-            tasks.add(act15.setValue(fre3));
             DatabaseReference act21 = re4.child("Temperatura");
             tasks.add(act21.setValue(tem3));
             //Envio datos Motor 4
@@ -300,8 +252,6 @@ public class Subida implements Runnable {
             tasks.add(act4.setValue(enco4));
             DatabaseReference act10 = re5.child("Voltaje");
             tasks.add(act10.setValue(vol4));
-            DatabaseReference act16 = re5.child("Frecuencia");
-            tasks.add(act16.setValue(fre4));
             DatabaseReference act22 = re5.child("Temperatura");
             tasks.add(act22.setValue(tem4));
             //Envio datos Motor 5
@@ -310,8 +260,6 @@ public class Subida implements Runnable {
             tasks.add(act5.setValue(enco5));
             DatabaseReference act11 = re6.child("Voltaje");
             tasks.add(act11.setValue(vol5));
-            DatabaseReference act17 = re6.child("Frecuencia");
-            tasks.add(act17.setValue(fre5));
             DatabaseReference act23 = re6.child("Temperatura");
             tasks.add(act23.setValue(tem5));
             //Envio datos Motor 6
@@ -320,8 +268,6 @@ public class Subida implements Runnable {
             tasks.add(act6.setValue(enco6));
             DatabaseReference act12 = re7.child("Voltaje");
             tasks.add(act12.setValue(vol6));
-            DatabaseReference act18 = re7.child("Frecuencia");
-            tasks.add(act18.setValue(fre6));
             DatabaseReference act24 = re7.child("Temperatura");
             tasks.add(act24.setValue(tem6));
             //Envio datos Motor 7 (si corresponde)
@@ -331,8 +277,6 @@ public class Subida implements Runnable {
             tasks.add(act25.setValue(enco7));
             DatabaseReference act26 = re8.child("Voltaje");
             tasks.add(act26.setValue(vol7));
-            DatabaseReference act27 = re8.child("Frecuencia");
-            tasks.add(act27.setValue(fre7));
             DatabaseReference act28 = re8.child("Temperatura");
             tasks.add(act28.setValue(tem7));  
             }
