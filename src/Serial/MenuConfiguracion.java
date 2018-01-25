@@ -54,16 +54,15 @@ public class MenuConfiguracion extends javax.swing.JFrame {
         ComboItem i = (ComboItem)jComboBox1.getSelectedItem();
         ComboItem j = (ComboItem)jComboBox2.getSelectedItem();
         ComboItem k = (ComboItem)jComboBox3.getSelectedItem();
-        
-        if (i.getPuerto() == j.getPuerto()){
+        if (i.getPuerto() != j.getPuerto()){
             JOptionPane.showMessageDialog(this,"El puerto del Controlador no puede ser igual al del Arduino.","Error",JOptionPane.ERROR_MESSAGE);
             return false;
         }
-        if (j.getPuerto() == k.getPuerto()){
+        if (j.getPuerto() != k.getPuerto()){
             JOptionPane.showMessageDialog(this,"El puerto del Controlador no puede ser igual al del ADAM.","Error",JOptionPane.ERROR_MESSAGE);
             return false;
         }
-        if (k.getPuerto() == i.getPuerto()){
+        if (k.getPuerto() != k.getPuerto()){
             JOptionPane.showMessageDialog(this,"El puerto del Arduino no puede ser igual al del ADAM.","Error",JOptionPane.ERROR_MESSAGE);
             return false;
         }
@@ -243,9 +242,8 @@ public class MenuConfiguracion extends javax.swing.JFrame {
             Adquisicion a = new Adquisicion(jCheckBox1.isSelected());
             a.scorbot = i.getPuerto();
             a.adam = k.getPuerto();
-            a.arduino = j.getPuerto();
-            a.arduino.setComPortParameters(9600, 8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
             a.lectura.start();
+            a.arduino = j.getPuerto();
             this.setVisible(false);
             a.setVisible(true);
         }

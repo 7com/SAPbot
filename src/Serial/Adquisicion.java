@@ -39,7 +39,7 @@ public class Adquisicion extends javax.swing.JFrame {
     //nombre de la prueba previamente indicado por el usuario.
     //Los datos que no sean parte de los encoder son enviados a la terminal del sistema.
     Thread lectura = new Thread() {
-        InputStream in,in2,in3;
+        private InputStream in,in2,in3;
         @Override
         public void run() {
             in = scorbot.getInputStream(); //Obtiene canal de Entrada del Controlador Scorbot-
@@ -172,13 +172,9 @@ public class Adquisicion extends javax.swing.JFrame {
         OutputStream out = arduino.getOutputStream();
         PrintStream printStream = new PrintStream(out);
         if (!slidebase)
-        {
             printStream.print("0");
-        }
         else
-        {
             printStream.print("1");
-        }
         char c = (char)in.read();
         while (c != '\r')
         {
@@ -198,12 +194,20 @@ public class Adquisicion extends javax.swing.JFrame {
         {
             for (int i=0;i<6;i++)
             {
+<<<<<<< HEAD
                 num="";
                 printStream.print("#02"+i+"\r");
                 char c = (char)in.read();
                 while (c != '\r')
                 {                  
                     num=num+c;
+=======
+                printStream.print("#02"+i);
+                char c = (char)in.read();
+                while (c != '\r')
+                {
+                    str=str+c;
+>>>>>>> parent of c9180d8... Arreglo Detalles 24-01-2018
                     c = (char)in.read();
                 }
                 num = num.replaceAll(">", "");
