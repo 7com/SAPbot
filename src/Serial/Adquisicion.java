@@ -191,44 +191,54 @@ public class Adquisicion extends javax.swing.JFrame {
     
     private String capturarAdam(InputStream in) throws IOException{
         String str="";
+        String num="";
         OutputStream out = adam.getOutputStream();
         PrintStream printStream = new PrintStream(out);
         if (!slidebase) 
         {
             for (int i=0;i<6;i++)
             {
+                num="";
                 printStream.print("#02"+i+"\r");
                 char c = (char)in.read();
                 while (c != '\r')
                 {                  
-                    str=str+c;
+                    num=num+c;
                     c = (char)in.read();
                 }
+                num = num.replaceAll(">", "");
+                float f = Float.parseFloat(num);
+                f=f*2.5f;
+                num = Float.toString(f);
                 if(i!=5)
-                    str=str+",";
+                    str=num+",";
                 else
-                    str=str+";";
+                    str=num+";";
             }
         }
         else
         {
             for (int i=0;i<7;i++)
             {
+                num="";
                 printStream.print("#02"+i);
                 char c = (char)in.read();
                 while (c != '\r')
-                {
-                    str=str+c;
+                {                  
+                    num=num+c;
                     c = (char)in.read();
                 }
+                num = num.replaceAll(">", "");
+                float f = Float.parseFloat(num);
+                f=f*2.5f;
+                num = Float.toString(f);
                 if(i!=6)
-                    str=str+",";
+                    str=num+",";
                 else
-                    str=str+";";
+                    str=num+";";
             }
         }
         printStream.close();
-        str = str.replaceAll(">", "");
         return str;
     }
     
