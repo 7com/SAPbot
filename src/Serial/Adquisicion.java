@@ -16,8 +16,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.math.RoundingMode;
+import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.swing.JOptionPane;
@@ -39,7 +42,7 @@ public class Adquisicion extends javax.swing.JFrame {
     //nombre de la prueba previamente indicado por el usuario.
     //Los datos que no sean parte de los encoder son enviados a la terminal del sistema.
     Thread lectura = new Thread() {
-        private InputStream in,in2,in3;
+        InputStream in,in2,in3;
         @Override
         public void run() {
             in = scorbot.getInputStream(); //Obtiene canal de Entrada del Controlador Scorbot-
@@ -68,6 +71,7 @@ public class Adquisicion extends javax.swing.JFrame {
                             encoAnterior=enco.clone();
                             datosArduino=capturarArduino(in2);
                             datosAdam=capturarAdam(in3);
+                            datosAdam=ajustarVoltaje(datosAdam);
                             if(!escribir(encoAnterior,datosArduino,datosAdam))
                                 consolaTXT("Error al Escribir Archivo: "+ruta+".txt");
                         }
@@ -85,6 +89,7 @@ public class Adquisicion extends javax.swing.JFrame {
                                     encoAnterior=enco.clone();
                                     datosArduino=capturarArduino(in2);
                                     datosAdam=capturarAdam(in3);
+                                    datosAdam=ajustarVoltaje(datosAdam);
                                     if(!escribir(encoAnterior,datosArduino,datosAdam))
                                         consolaTXT("Error al Escribir Archivo: "+ruta+".txt");
                                 }
@@ -172,9 +177,13 @@ public class Adquisicion extends javax.swing.JFrame {
         OutputStream out = arduino.getOutputStream();
         PrintStream printStream = new PrintStream(out);
         if (!slidebase)
+        {
             printStream.print("0");
+        }
         else
+        {
             printStream.print("1");
+        }
         char c = (char)in.read();
         while (c != '\r')
         {
@@ -185,64 +194,67 @@ public class Adquisicion extends javax.swing.JFrame {
         return str;
     }
     
+    private String ajustarVoltaje(String s){
+        String temp="";
+        NumberFormat formatter = NumberFormat.getInstance(Locale.US);
+        formatter.setMaximumFractionDigits(2);
+        formatter.setMinimumFractionDigits(2);
+        formatter.setRoundingMode(RoundingMode.HALF_UP); 
+        String[] volt = s.substring(0, s.length()-1).split(",");
+        float t = 0.0f;
+        for (int i=0; i<volt.length; i++)
+        {
+            t = Float.parseFloat(volt[i]);
+            t = t * 2.5f;
+            t = new Float(formatter.format(t));
+            if(i!=volt.length-1)
+                temp=temp+Float.toString(t)+",";
+            else
+                temp=temp+Float.toString(t)+";";
+        }
+        return temp;
+    }
+    
     private String capturarAdam(InputStream in) throws IOException{
         String str="";
-        String num="";
         OutputStream out = adam.getOutputStream();
         PrintStream printStream = new PrintStream(out);
         if (!slidebase) 
         {
             for (int i=0;i<6;i++)
             {
-<<<<<<< HEAD
-                num="";
                 printStream.print("#02"+i+"\r");
                 char c = (char)in.read();
                 while (c != '\r')
                 {                  
-                    num=num+c;
-=======
-                printStream.print("#02"+i);
-                char c = (char)in.read();
-                while (c != '\r')
-                {
                     str=str+c;
->>>>>>> parent of c9180d8... Arreglo Detalles 24-01-2018
                     c = (char)in.read();
                 }
-                num = num.replaceAll(">", "");
-                float f = Float.parseFloat(num);
-                f=f*2.5f;
-                num = Float.toString(f);
                 if(i!=5)
-                    str=num+",";
+                    str=str+",";
                 else
-                    str=num+";";
+                    str=str+";";
             }
         }
         else
         {
             for (int i=0;i<7;i++)
             {
-                num="";
                 printStream.print("#02"+i);
                 char c = (char)in.read();
                 while (c != '\r')
-                {                  
-                    num=num+c;
+                {
+                    str=str+c;
                     c = (char)in.read();
                 }
-                num = num.replaceAll(">", "");
-                float f = Float.parseFloat(num);
-                f=f*2.5f;
-                num = Float.toString(f);
                 if(i!=6)
-                    str=num+",";
+                    str=str+",";
                 else
-                    str=num+";";
+                    str=str+";";
             }
         }
         printStream.close();
+        str = str.replaceAll(">", "");
         return str;
     }
     
