@@ -19,13 +19,15 @@ import java.util.StringTokenizer;
 import javax.swing.JOptionPane;
 
 public class Subida implements Runnable {
-    private String ruta, nombre, BD_URL, CREDENCIALES, fecha;
-    private Adquisicion a;
+
+    private final String ruta;
+    private final String nombre;
+    private final String BD_URL;
+    private final String CREDENCIALES;
+    private final Adquisicion a;
     private File f;
-    private boolean inicializado;
 
     public Subida(String s, String n, Adquisicion a) throws FileNotFoundException {
-        this.inicializado = false;
         ruta=s;
         nombre=n;
         this.a=a;
@@ -280,6 +282,10 @@ public class Subida implements Runnable {
             DatabaseReference act28 = re8.child("Temperatura");
             tasks.add(act28.setValue(tem7));  
             }
+            
+            DatabaseReference ref2 = database.getReference("*Sin Procesar");
+            DatabaseReference dr = ref2.child(nombre);
+            tasks.add(dr.setValue(a.fecha+" - "+c2));
             a.consolaTXT("Subiendo prueba "+nombre+" a Firebase...");
             //Se verifican que todos los datos se han subido a la nube.
             for(int i=0;i<tasks.size();i++)
