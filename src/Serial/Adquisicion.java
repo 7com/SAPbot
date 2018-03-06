@@ -42,7 +42,7 @@ public class Adquisicion extends javax.swing.JFrame {
     //nombre de la prueba previamente indicado por el usuario.
     //Los datos que no sean parte de los encoder son enviados a la terminal del sistema.
     Thread lectura = new Thread() {
-        InputStream in,in2,in3;
+        InputStream in,in2,in3;        
         @Override
         public void run() {
             in = scorbot.getInputStream(); //Obtiene canal de Entrada del Controlador Scorbot-

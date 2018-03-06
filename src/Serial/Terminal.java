@@ -31,6 +31,8 @@ public class Terminal extends javax.swing.JFrame {
     public Terminal() {
         initComponents();
         this.getContentPane().setBackground(Color.white);
+        jTextArea1.setLineWrap(true);
+        jTextArea1.getDocument().addDocumentListener(new LimitLinesDocumentListener(50));
     }
     
     //Función para configurar el ícono de la ventana.
